@@ -3,7 +3,7 @@ CLEANEXTS = o a
 
 #fichier cible et répertoire d'installation
 OUTPUTFILE = libMagnet.a
-INSTALLDIR = ../bin
+INSTALLDIR = ../lib
 
 
 .PHONY: all
@@ -25,7 +25,7 @@ Exception.o : 	Exception.cpp Exception.h
 .PHONY: install
 install:		
 				mkdir -p $(INSTALLDIR)
-				cp -p $(OUTPUTFILE) $(INSTALLDIR)
+				mv $(OUTPUTFILE) $(INSTALLDIR)
 
 .PHONY: clean
 clean: 			
