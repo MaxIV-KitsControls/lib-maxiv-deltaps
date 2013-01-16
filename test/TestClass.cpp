@@ -282,9 +282,24 @@ main (int argc, char **argv)
 
 	try{
 		std::cout<<"---------------TEST0---------------"<<std::endl;
-		Magnet = new itPole2811("192.168.150.101",3,4);
+		Magnet = new itPole2811("192.168.150.101",3,2);
 		std::cout<<Magnet->addrIP()<<std::endl;
-		Magnet->set_current(1);
+
+		//-------------------------------------------------------------------
+		Magnet->get_idata(&myDataX_Magnet1);
+
+		std::cout<<"---------------IDATA---------------"<<std::endl;
+		std::cout<<"MAGNET :"<<myDataX_Magnet1.magnet<<std::endl;
+		std::cout<<"POLE :"<<myDataX_Magnet1.pole<<std::endl;
+		std::cout<<"STATE :"<<myDataX_Magnet1.state<<std::endl;
+		std::cout<<"FAIL :"<<myDataX_Magnet1.fail<<std::endl;
+		std::cout<<"MEASVOLT :"<<myDataX_Magnet1.measvolt<<std::endl;
+		std::cout<<"MEASCURR :"<<myDataX_Magnet1.meascurr<<std::endl;
+		std::cout<<"MEASCURR :"<<Magnet->get_measure_current()<<std::endl;
+		std::cout<<"-----------------------------------"<<std::endl;
+
+		sleep(5);
+		Magnet->set_current(3);
 
 		Magnet->set_state(MAGNET_ON);
 
@@ -300,7 +315,7 @@ main (int argc, char **argv)
 		std::cout<<"MEASCURR :"<<myDataX_Magnet1.meascurr<<std::endl;
 		std::cout<<"MEASCURR :"<<Magnet->get_measure_current()<<std::endl;
 		std::cout<<"-----------------------------------"<<std::endl;
-
+		
 		sleep(5);
 
 		//-------------------------------------------------------------------
