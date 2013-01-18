@@ -11,8 +11,7 @@ all: $(OUTPUTFILE)
 
 
 TestMagnet : 	TestClass.o
-			g++ -o TestMagnet TestClass.o -L../lib -lMagnet	
-
+			g++ -D_REENTRANT -o TestMagnet TestClass.o -L../lib -lMagnet -lpthread
 
 TestClass.o : 	TestClass.cpp TestClass.h 
 						g++ -c TestClass.cpp  -I../src
