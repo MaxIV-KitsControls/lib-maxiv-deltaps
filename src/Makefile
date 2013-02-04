@@ -1,37 +1,25 @@
-#extension des fichiers à effacer lors du nettoyage
-CLEANEXTS = o a
+OUTPUT_DIR = ../lib
+INSTALL_PREFIX = /home/tango
 
-#fichier cible et répertoire d'installation
-OUTPUTFILE = libMagnet.a
-INSTALLDIR = ../lib
+TARGET = $(OUTPUT_DIR)/libMagnet.a
 
+SOURCES = $(wildcard *.cpp)
+HEADERS = $(wildcard *.h)
 
-.PHONY: all
-all: $(OUTPUTFILE)
+OBJS = $(SOURCES:.cpp=.o)
+RANLIB = ranlib
 
+all: $(TARGET)
 
-libMagnet.a : 	ClassMagnet.o Exception.o
-				ar ru libMagnet.a ClassMagnet.o Exception.o
-				ranlib libMagnet.a
+$(TARGET): $(OBJS) $(HEADERS) Makefile
+	mkdir -p $(OUTPUT_DIR)
+	$(AR) ru $@ $(OBJS)
+	$(RANLIB) $@
 
+install: $(TARGET)
+	mkdir -p $(INSTALL_PREFIX)/{include,lib}
+	install -m644 $(HEADERS) $(INSTALL_PREFIX)/include
+	install -m644 $(TARGET) $(INSTALL_PREFIX)/lib
 
-ClassMagnetTest.o : 	ClassMagnet.cpp ClassMagnet.h 
-						g++ -c ClassMagnet.cpp
-
-Exception.o : 	Exception.cpp Exception.h
-				g++ -c Exception.cpp
-
-
-.PHONY: install
-install:		
-				mkdir -p $(INSTALLDIR)
-				mv $(OUTPUTFILE) $(INSTALLDIR)
-
-.PHONY: clean
-clean: 			
-				for file in $(CLEANEXTS); do rm -f *.$$file; done
-
-ClassMagnet.o: ClassMagnet.h Exception.h
-Exception.o: Exception.h
-
-
+clean:
+	rm -f $(TARGET) $(OBJS)
