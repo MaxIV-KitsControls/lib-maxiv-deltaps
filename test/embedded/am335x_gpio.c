@@ -74,7 +74,7 @@ int gpio_init(unsigned int pin, unsigned int direction)
 {
 	int fd;
 
-	if (BANK(pin) > AM335X_GPIO_BANKS)
+	if (BANK(pin) >= AM335X_GPIO_BANKS)
 		return -1;
 
 	if (!_regmap[BANK(pin)])
@@ -110,7 +110,7 @@ int gpio_init(unsigned int pin, unsigned int direction)
 
 int gpio_free(unsigned int pin)
 {
-	if (BANK(pin) > AM335X_GPIO_BANKS)
+	if (BANK(pin) >= AM335X_GPIO_BANKS)
 		return -1;
 
 	if (--_users[BANK(pin)] > 0)
@@ -122,7 +122,7 @@ int gpio_free(unsigned int pin)
 
 int gpio_set(unsigned int pin, unsigned int value)
 {
-	if (BANK(pin) > AM335X_GPIO_BANKS)
+	if (BANK(pin) >= AM335X_GPIO_BANKS)
 		return -1;
 
 	if (!_regmap[BANK(pin)] || _regmap[BANK(pin)] == MAP_FAILED)
@@ -138,7 +138,7 @@ int gpio_set(unsigned int pin, unsigned int value)
 
 int gpio_get(unsigned int pin)
 {
-	if (BANK(pin) > AM335X_GPIO_BANKS)
+	if (BANK(pin) >= AM335X_GPIO_BANKS)
 		return -1;
 
 	if (!_regmap[BANK(pin)] || _regmap[BANK(pin)] == MAP_FAILED)
