@@ -474,11 +474,11 @@ bool test_trigger(bool software_trigger)
 		std::cout<<">CURRENT TRIGGER SETTING"<<std::endl;
 		std::cout<<"POLE 1 : "<< expected_current1 <<std::endl;
 		pole1->set_current_latch(expected_current1);
-		pole1->set_trigger_delay(3);
+		pole1->set_trigger_delay(0);
 		pole1->set_trigger_state(true);
 		std::cout<<"POLE 2 : "<< expected_current2 <<std::endl;
 		pole2->set_current_latch(expected_current2);
-		pole2->set_trigger_delay(3);
+		pole2->set_trigger_delay(0);
 		pole2->set_trigger_state(true);
 
 		if(software_trigger)
@@ -550,6 +550,7 @@ void display_request_rate(itPole2811* pole)
 	timeval start, end, ellapsed;
 	int count=0;
 	int error=0;
+	int nb_request=0;
 	long int time=0;
 
 	while(true)
@@ -557,6 +558,7 @@ void display_request_rate(itPole2811* pole)
 		
 		try
 		{
+			nb_request++;
 			gettimeofday(&start, NULL);
 			pole->get_measure_current();
 			gettimeofday(&end, NULL);
@@ -572,7 +574,7 @@ void display_request_rate(itPole2811* pole)
 			}
 		}
 		time = timeval_subtract(&ellapsed, &end, &start);
-		std::cout << "\r" << "Time to serve ("<<error<<"): "<< time<< "             ";
+		std::cout << "\r" << "Time to serve ("<<error<<"/"<< nb_request<<"): "<< time<< "             ";
 		std::cout.flush(); 
 	}
 }
@@ -671,16 +673,27 @@ main (int argc, char **argv)
 			int result = test_max_connection(argv[2],atoi(argv[3]),atoi(argv[4]));
 			std::cout << "Number max of connection acception :"<< result << std::endl;
 		}
-		else
-		{
-			while(argc--)
-			{
-                		printf("%s\n", *argv++);
-			}
-		}
+	}
+	else
+	{
+		std::cout << "Usage : TestMagnet Action Parameters" << std::endl;
+		std::cout << std::endl;
+		std::cout << "Actions are > " << std::endl;
+		std::cout << "* display-request-rate : " << std::endl;
+		std::cout << "  Read the current as fast as possible with 1 socket" << std::endl;
+		std::cout << "  and display the response time of each request in us" << std::endl;
+		std::cout << std::endl;
+		std::cout << "   - Parameters are : IP POLE_NUMBER" << std::endl;
+		std::cout << std::endl;
+		std::cout << "Example $> TestMagnet display-request-rate 192.168.150.107 2" << std::endl;
+		std::cout << "        > Current display (pole=2;ip=192.168.150.107)" << std::endl;
+		std::cout << "        > Time to serve (0/25363): 1955             " << std::endl;
+		std::cout << "                         |   |      + response time in us " << std::endl;
+		std::cout << "                         |   + number of try               " << std::endl;
+		std::cout << "                         + number of error                 " << std::endl;
+	}
 		
 			
-	}
 	return 0;
 }
 
