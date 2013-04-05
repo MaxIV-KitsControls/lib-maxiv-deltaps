@@ -120,7 +120,7 @@ class Socket{
 	protected:
 	public:	
 		Socket(const char *StrIP);
-		~Socket(void);
+		virtual ~Socket(void);
 		char *query(const std::string& Str);	
 		void write(const std::string& Str);
 };
@@ -134,7 +134,7 @@ class itBilt : private Socket	//public Socket modif V202 05/06/07
 	protected:
 	public:	
 		itBilt(const char *StrIP);
-		~itBilt(void);
+		virtual ~itBilt(void);
 		void write(const std::string& _Str) throw (itest::ItestException);
 		char *query(const std::string& _Str) throw (itest::ItestException);	//ajout de const modif V202 05/06/07
 };
@@ -156,7 +156,7 @@ class itPole2811{
 	public:
 		itPole2811(itBilt *_Bilt, int _NumMagnet, int _NumPole,int _NumInst);
 		itPole2811(const char *_AddrIp, int _NumPole,int _NumInst);
-		~itPole2811(void);
+		virtual ~itPole2811(void);
 
         	//current
 		double get_measure_current(void) throw (itest::ItestException);
