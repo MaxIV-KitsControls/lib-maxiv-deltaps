@@ -3,7 +3,7 @@ INSTALL_PREFIX = /home/tango
 
 TARGET = $(OUTPUT_DIR)/TestMagnet
 
-SOURCES = pstest.cpp
+SOURCES = TestClass.cpp
 HEADERS = 
 
 CXXFLAGS = -I../../src

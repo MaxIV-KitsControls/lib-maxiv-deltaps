@@ -13,7 +13,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-#include "ClassMagnet.h"
+#include "DeltaPS.h"
 
 //g++ -o TestClass TestClass.cpp -L./ -lMagnet
 //--------
@@ -21,8 +21,7 @@
 //--------
 
 using namespace std;
-using namespace itest;
-itPole2811 *Magnet=0;
+PSC_ETH *Magnet=0;
 struct idata myDataX_Magnet1;
 
 
@@ -41,7 +40,8 @@ void test0()
 
 	try{
 		std::cout<<"---------------TEST0---------------"<<std::endl;
-		Magnet = new itPole2811("192.168.150.101",1,2);
+		Magnet = new PSC_ETH("192.168.150.101");
+		
 		std::cout<<Magnet->addrIP()<<std::endl;
 		float tab[]={1.,2.,2.001,1.,-0.5,-3};
 		Magnet->set_current_buffer(tab,0,6);
@@ -54,7 +54,7 @@ void test0()
 		Magnet->set_current_latch_source(CURR_LATCH_SOURCE_BUFFER);
 		Magnet->set_state(MAGNET_ON);
 		sleep(1);
-		initiate_udp_trigger("192.168.150.255");
+		//initiate_udp_trigger("192.168.150.255");
 
 		while(getchar() != 'q')
 			std::cout<<"\r"<<"MEASCURR1 :"<<Magnet->get_measure_current();
@@ -65,7 +65,7 @@ void test0()
 
 		delete Magnet;
 	}
-	catch(ItestException &e)
+	catch(yat::Exception &e)
 	{
 		for(int i=0;i<e.errors.size();i++)		//gestion des exceptions empilées dans le vecteur d'erreur
        		{
@@ -80,7 +80,7 @@ void test1()
 
 	try{
 		std::cout<<"---------------TEST1---------------"<<std::endl;
-		Magnet = new itPole2811("192.168.150.101",1,2);
+		Magnet = new PSC_ETH("192.168.150.101");
 		std::cout<<Magnet->addrIP()<<std::endl;
 		Magnet->set_current(1);
 		std::cout<<"CURRENT SETTING:"<<1<<std::endl;
@@ -107,7 +107,7 @@ void test1()
 		std::cout<<"-----------------------------------"<<std::endl;
 
 	}
-	catch(ItestException &e)
+	catch(yat::Exception &e)
 	{
 		for(int i=0;i<e.errors.size();i++)		//gestion des exceptions empilées dans le vecteur d'erreur
        		{
@@ -123,7 +123,7 @@ bool test2()
 	bool result=false;
 	try{
 		std::cout<<"---------------TEST2---------------"<<std::endl;
-		Magnet = new itPole2811("192.168.150.101",1,2);
+		Magnet = new PSC_ETH("192.168.150.101");
 		Magnet->clear_all_err();
 		Magnet->set_trigger_state(TRIGGER_STATE_ON);
 		Magnet->set_state(MAGNET_ON);
@@ -159,7 +159,7 @@ bool test2()
 		Magnet->set_trigger_delay(3);
 
 		sleep(10);
-		initiate_udp_trigger("192.168.150.255");
+		//initiate_udp_trigger("192.168.150.255");
 		//-------------------------------------------------------------------
 		do{
 			std::cout<<"\r"<<"MEASCURR1 :"<<Magnet->get_measure_current();
@@ -185,7 +185,7 @@ bool test2()
 		Magnet->set_current_latch(5);
 		std::cout<<"CURRENT TRIGGER SETTING:"<<5<<std::endl;
 		Magnet->set_trigger_delay(0);
-		initiate_udp_trigger("192.168.150.255");
+		//initiate_udp_trigger("192.168.150.255");
 		//-------------------------------------------------------------------
 		do{
 			std::cout<<"\r"<<"MEASCURR1 :"<<Magnet->get_measure_current();
@@ -217,7 +217,7 @@ bool test2()
 
 		delete Magnet;
 	}
-	catch(ItestException &e)
+	catch(yat::Exception &e)
 	{
 		for(int i=0;i<e.errors.size();i++)		//gestion des exceptions empilées dans le vecteur d'erreur
        		{
@@ -234,7 +234,7 @@ bool test3()
 	bool result=false;
 	try{
 		std::cout<<"---------------TEST3---------------"<<std::endl;
-		Magnet = new itPole2811("192.168.150.101",1,2);
+		Magnet = new PSC_ETH("192.168.150.101");
 		Magnet->clear_all_err();
 		Magnet->set_trigger_state(TRIGGER_STATE_ON);
 		Magnet->set_state(MAGNET_ON);
@@ -300,7 +300,7 @@ bool test3()
 
 		delete Magnet;
 	}
-	catch(ItestException &e)
+	catch(yat::Exception &e)
 	{
 		for(int i=0;i<e.errors.size();i++)		//gestion des exceptions empilées dans le vecteur d'erreur
        		{
@@ -319,7 +319,7 @@ bool test4()
 
 	try{
 		std::cout<<"---------------TEST4---------------"<<std::endl;
-		Magnet = new itPole2811("192.168.150.101",1,2);
+		Magnet = new PSC_ETH("192.168.150.101");
 		std::cout<<Magnet->addrIP()<<std::endl;
 
 		//-------------------------------------------------------------------
@@ -370,7 +370,7 @@ bool test4()
 		
 		delete Magnet;
 	}
-	catch(ItestException &e)
+	catch(yat::Exception &e)
 	{
 		for(int i=0;i<e.errors.size();i++)		//gestion des exceptions empilées dans le vecteur d'erreur
        		{
@@ -383,7 +383,7 @@ bool test4()
 	return result;
 }
 
-void init_pole(itPole2811* pole)
+void init_pole(PSC_ETH* pole)
 {
 	pole->clear_all_err();
 	pole->set_trigger_state(TRIGGER_STATE_ON);
@@ -399,13 +399,13 @@ void init_pole(itPole2811* pole)
 	std::cout<<std::endl;
 }
 
-void release_pole(itPole2811* pole)
+void release_pole(PSC_ETH* pole)
 {
 	sleep(2);
 	pole->set_state(MAGNET_OFF);
 }
 
-void display_counter(itPole2811* pole)
+void display_counter(PSC_ETH* pole)
 {
 	int ctn1,ctn2;
 	pole->get_ctn(&ctn1,&ctn2);
@@ -414,7 +414,7 @@ void display_counter(itPole2811* pole)
 	std::cout<<"CTN4 :"<<ctn2<<std::endl;
 }
 
-void display_pole(itPole2811* pole)
+void display_pole(PSC_ETH* pole)
 {
 
 	pole->get_idata(&myDataX_Magnet1);
@@ -430,7 +430,7 @@ void display_pole(itPole2811* pole)
 	std::cout<<"-----------------------------------"<<std::endl;
 }
 
-void wait_slope_completion(itPole2811* pole)
+void wait_slope_completion(PSC_ETH* pole)
 {
 	std::cout<<"WAIT CURRENT SLOPE COMPLETION "<<std::endl;
 	do{
@@ -439,7 +439,7 @@ void wait_slope_completion(itPole2811* pole)
 	std::cout<<std::endl;
 
 }
-void wait_tracking(itPole2811* pole)
+void wait_tracking(PSC_ETH* pole)
 {
 	std::cout<<"WAIT CURRENT TRACKING COMPLETION "<<std::endl;
 	do{
@@ -448,86 +448,8 @@ void wait_tracking(itPole2811* pole)
 	std::cout<<std::endl;
 }
 
-bool test_trigger(bool software_trigger)
-{
-	bool result=false;
-	itPole2811* pole1=0;
-	itPole2811* pole2=0;
 
-	double expected_current1=0.2;
-	double expected_current2=0.2;
-
-	try{
-		std::cout<<"---------------TEST TRIGGER---------------"<<std::endl;
-		// Initialise the different pole to synchronise
-		std::cout<<"INITIALISE POLE 1"<<std::endl;
-		pole1 = new itPole2811("192.168.150.101",1,1);
-		init_pole(pole1);
-		display_pole(pole1);
-
-		std::cout<<"INITIALISE POLE 2"<<std::endl;
-		pole2 = new itPole2811("192.168.150.101",1,5);
-		init_pole(pole2);
-		display_pole(pole2);
-			
-		//Set the current latch to trig
-		std::cout<<">CURRENT TRIGGER SETTING"<<std::endl;
-		std::cout<<"POLE 1 : "<< expected_current1 <<std::endl;
-		pole1->set_current_latch(expected_current1);
-		pole1->set_trigger_delay(0);
-		pole1->set_trigger_state(true);
-		std::cout<<"POLE 2 : "<< expected_current2 <<std::endl;
-		pole2->set_current_latch(expected_current2);
-		pole2->set_trigger_delay(0);
-		pole2->set_trigger_state(true);
-
-		if(software_trigger)
-		{
-			std::cout<<"SOFTWARE TRIGGER : "<< "192.168.150.255" <<std::endl;
-			initiate_udp_trigger("192.168.150.255");
-		}
-		else
-		{
-			std::cout<<"HARDWARE TRIGGER : WAITING FOR EVENT" <<std::endl;
-			sleep(5);
-		}
-
-		//-------------------------------------------------------------------
-		//Display current current value of both poles
-		//should be threaded to follow up in live 
-		//but the purpose is to test the triggers
-		wait_slope_completion(pole1);
-		wait_tracking(pole1);
-
-		wait_slope_completion(pole2);
-		wait_tracking(pole2);
-
-		display_pole(pole1);
-		display_pole(pole2);
-		//-------------------------------------------------------------------
-		//release_pole(pole1);
-		//release_pole(pole2);
-		
-		display_counter(pole1);
-		display_counter(pole2);
-
-		delete pole1;
-		delete pole2;
-	}
-	catch(ItestException &e)
-	{
-		for(int i=0;i<e.errors.size();i++)		//gestion des exceptions empilées dans le vecteur d'erreur
-       		{
-			std::cout<<e.errors[i].reason<<" , "<<e.errors[i].desc<<" , "<<e.errors[i].origin<<" , "<<
-					e.errors[i].code<<std::endl;
-		}
-		delete pole1;
-		delete pole2;
-	}	
-	return result;
-}
-
-void display_current(itPole2811* pole)
+void display_current(PSC_ETH* pole)
 {
 	//std::cout<<std::endl;
 	try
@@ -535,7 +457,7 @@ void display_current(itPole2811* pole)
 		std::cout << "\r" << "Current :" << pole->get_measure_current();
 		std::cout.flush(); 
 	}
-	catch(ItestException &e)
+	catch(yat::Exception &e)
 	{
 		for(int i=0;i<e.errors.size();i++)		//gestion des exceptions empilées dans le vecteur d'erreur
        		{
@@ -545,7 +467,7 @@ void display_current(itPole2811* pole)
 	}
 }
 
-void display_request_rate(itPole2811* pole)
+void display_request_rate(PSC_ETH* pole)
 {
 	timeval start, end, ellapsed;
 	int count=0;
@@ -563,7 +485,7 @@ void display_request_rate(itPole2811* pole)
 			pole->get_measure_current();
 			gettimeofday(&end, NULL);
 		}
-		catch(ItestException &e)
+		catch(yat::Exception &e)
 		{
 			gettimeofday(&end, NULL);
 			error++;
@@ -579,47 +501,6 @@ void display_request_rate(itPole2811* pole)
 	}
 }
 
-int test_max_connection(const char *ip, int pole_number, int max)
-{
-	std::cout << "LAUNCH TEST MAX CONNECTION : "<< ip << " " << pole_number << " " << max << std::endl;
-	int result=0;
-	int counter=0;
-	int MAX=max;
-	
-	itPole2811** poles = new itPole2811*[MAX];
-
-        try
-        {
-		// try the maximum of connection
-		// To check the connection the only way is to send a request
-		// (The constructor is protected against socket Exception)	
-		for(int i=0;i<MAX;i++)
-		{
-			std::cout << "[DEBUG] CREATE CONNECTION "<< i << std::endl;
-			poles[i] = new itPole2811(ip,1,pole_number);
-			counter++;
-			poles[i]->get_measure_current();
-			result++;
-		}
-        }
-        catch(ItestException &e)
-        {
-                for(int i=0;i<e.errors.size();i++)              //gestion des exceptions empilées dans le vecteur d'erreur
-                {
-                        std::cout<<e.errors[i].reason<<" , "<<e.errors[i].desc<<" , "<<e.errors[i].origin<<" , "<<
-                                        e.errors[i].code<<std::endl;
-                }
-        }
-	
-	for(int i=0;i<counter;i++)
-	{
-		std::cout << "[DEBUG] DELETE CONNECTION "<< i << std::endl;
-		delete poles[i];
-	}
-	delete[] poles;
-
-	return result;
-}
 
 main (int argc, char **argv)
 { 
@@ -634,7 +515,7 @@ main (int argc, char **argv)
 			std::string ip = argv[2]; 
 			int pole_number = atoi(argv[3]);
 
-			itPole2811* pole = new itPole2811(ip.c_str(),1,pole_number);
+			PSC_ETH* pole = new PSC_ETH(ip.c_str());
 			// Display the value indefinitively
 			int i=0;
 			while(true)
@@ -654,25 +535,14 @@ main (int argc, char **argv)
 			std::string ip = argv[2]; 
 			int pole_number = atoi(argv[3]);
 
-			itPole2811* pole = new itPole2811(ip.c_str(),1,pole_number);
+			PSC_ETH* pole = new PSC_ETH(ip.c_str());
 			// Display the value indefinitively
 			//std::cout<<"Frame "<<i++<<std::endl;
 			display_request_rate(pole);
 			// In case of ...
 			delete pole;
 		}
-		// Launch the trigger test
-		else if (strcmp(argv[1],"test-trigger")==0 && argc>2)
-		{
-			bool software_trigger = strcmp(argv[2],"SOFTWARE")==0;
-			test_trigger(software_trigger);
-		}
-		// Launch the max of connection test
-		else if (strcmp(argv[1],"test-connection")==0 && argc>4)
-		{
-			int result = test_max_connection(argv[2],atoi(argv[3]),atoi(argv[4]));
-			std::cout << "Number max of connection acception :"<< result << std::endl;
-		}
+		
 	}
 	else
 	{
