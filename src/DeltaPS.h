@@ -26,7 +26,7 @@ public:
 
 	std::string idn();
 	double max_voltage();
-	std::string addrIP(void){return ip_address;}
+	std::string addrIP();
 
 	void send_software_trigger();
 
@@ -60,6 +60,7 @@ public:
 
         	void initiate_trigger(void) throw (yat::Exception);
 
+		std::string read_error(void) throw (yat::Exception);
 		void clear_all_err(void) throw (yat::Exception);
 
 		int get_state(void) throw (yat::Exception);
@@ -86,13 +87,6 @@ private:
 	yat::ClientSocket sock;
 	std::string ip_address;
 };
-struct idata{
-	int magnet;
-	int pole;
-	int state;
-	std::string fail;
-	double measvolt;
-	double meascurr;
-};
+
 
 #endif // _DELTAPS_H_

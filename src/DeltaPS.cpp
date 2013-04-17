@@ -30,6 +30,11 @@ std::string PSC_ETH::idn() {
 	return result;
 }
 
+std::string PSC_ETH::addrIP()
+{
+	return ip_address;
+}
+
 double PSC_ETH::max_voltage() {
 	std::string reply;
 	double d;
@@ -40,6 +45,213 @@ double PSC_ETH::max_voltage() {
 	std::istringstream i(reply);
 	i >> d;
 	return d;
+}
+
+//---------------------------------------------------------------------------
+//Read the Status:Operation:Shutdown:Condition register
+//0=OFF;1=ON;2=WARNING;3=ALARM
+//---------------------------------- 
+int PSC_ETH::get_state(void) throw (yat::Exception)
+{
+try{
+	std::string reply;
+	int d;
+
+	sock << "status:operation:shutdown:condition?\n";
+	sock >> reply;
+
+	std::istringstream i(reply);
+	i >> d;
+	return d;
+}
+catch(yat::Exception &e)
+{
+	std::ostringstream Desc;
+	Desc<<"YAT exception caught on magnet with ip: "<<this->ip_address<<std::ends;
+	e.push_error("State could not be read",Desc.str(), "PSC_ETH::get_state");
+	throw e;
+}
+catch(...)
+{
+	std::ostringstream Desc;
+	Desc<<"Unknown exception caught on magnet with ip: "<<this->ip_address<<std::ends;
+	yat::Exception e("Unknown error",Desc.str(),"PSC_ETH::get_state");
+	throw e; 
+}
+}
+//---------------------------------------------------------------------------
+void PSC_ETH::set_state(bool val) throw (yat::Exception)
+{
+try{
+	std::ostringstream oss;
+
+	oss<<"output" << val << "\n"; 
+	sock << oss.str();
+}
+catch(yat::Exception &e)
+{
+	std::ostringstream Desc;
+	Desc<<"YAT exception caught on magnet with ip: "<<this->ip_address<<std::ends;
+	e.push_error("State could not be set",Desc.str(), "PSC_ETH::set_state");
+	throw e;
+}
+catch(...)
+{
+	std::ostringstream Desc;
+	Desc<<"Unknown exception caught on magnet with ip: "<<this->ip_address<<std::ends;
+	yat::Exception e("Unknown error",Desc.str(),"PSC_ETH::set_state");
+	throw e; 
+}
+}
+//---------------------------------------------------------------------------------
+std::string PSC_ETH::read_error(void) throw (yat::Exception)
+{
+try{
+	std::ostringstream oss;
+
+	oss<<"system:error?\n";
+
+	for(int i=0;i<5;i++)
+	{
+		sock << oss.str();	
+	}
+	std::string result;
+
+	sock << "system:error?\n";
+	sock >> result;
+
+	return result;
+}
+catch(yat::Exception &e)
+{
+	std::ostringstream Desc;
+	Desc<<"YAT exception caught on magnet with ip: "<<this->ip_address<<std::ends;
+	e.push_error("Error could not be read",Desc.str(), "PSC_ETH::clear_all_err");
+	throw e;
+}
+catch(...)
+{
+	std::ostringstream Desc;
+	Desc<<"Unknown exception caught on magnet with ip: "<<this->ip_address<<std::ends;
+	yat::Exception e("Unknown error",Desc.str(),"PSC_ETH::clear_all_err");
+	throw e; 
+}
+}
+//---------------------------------------------------------------------------
+//Empty error queue (has 5 slots)
+//----------------------------------
+void PSC_ETH::clear_all_err(void) throw (yat::Exception)
+{
+try{
+	
+	for(int i=0;i<5;i++)
+	{
+		sock << "system:error?\n";	
+	}
+}
+catch(yat::Exception &e)
+{
+	std::ostringstream Desc;
+	Desc<<"YAT exception caught on magnet with ip: "<<this->ip_address<<std::ends;
+	e.push_error("Error could not be read",Desc.str(), "PSC_ETH::clear_all_err");
+	throw e;
+}
+catch(...)
+{
+	std::ostringstream Desc;
+	Desc<<"Unknown exception caught on magnet with ip: "<<this->ip_address<<std::ends;
+	yat::Exception e("Unknown error",Desc.str(),"PSC_ETH::clear_all_err");
+	throw e; 
+}
+}
+//---------------------------------------------------------------------------
+//Get the measured current
+//----------------------------------
+double PSC_ETH::get_measure_current(void) throw (yat::Exception)
+{
+try{
+	std::string reply;
+	double d;
+
+	sock << "measure:current?\n";
+	sock >> reply;
+
+	std::istringstream i(reply);
+	i >> d;
+	return d;
+}
+catch(yat::Exception &e)
+{
+	std::ostringstream Desc;
+	Desc<<"YAT exception caught on magnet with ip: "<<this->ip_address<<std::ends;
+	e.push_error("Measured current could not be read",Desc.str(), "PSC_ETH::get_measure_current");
+	throw e;
+}
+catch(...)
+{
+	std::ostringstream Desc;
+	Desc<<"Unknown exception caught on magnet with ip: "<<this->ip_address<<std::ends;
+	yat::Exception e("Unknown error",Desc.str(),"PSC_ETH::get_measure_current");
+	throw e; 
+}
+}
+//---------------------------------------------------------------------------
+//Get the measured voltage
+//----------------------------------
+double PSC_ETH::get_measure_voltage(void) throw (yat::Exception)
+{
+try{
+	std::string reply;
+	double d;
+
+	sock << "measure:voltage?\n";
+	sock >> reply;
+
+	std::istringstream i(reply);
+	i >> d;
+	return d;
+}
+catch(yat::Exception &e)
+{
+	std::ostringstream Desc;
+	Desc<<"YAT exception caught on magnet with ip: "<<this->ip_address<<std::ends;
+	e.push_error("Measured voltage could not be read",Desc.str(), "PSC_ETH::get_measure_voltage");
+	throw e;
+}
+catch(...)
+{
+	std::ostringstream Desc;
+	Desc<<"Unknown exception caught on magnet with ip: "<<this->ip_address<<std::ends;
+	yat::Exception e("Unknown error",Desc.str(),"PSC_ETH::get_measure_voltage");
+	throw e; 
+}
+}
+//---------------------------------------------------------------------------
+//Set the current
+//---------------------------------- 
+void PSC_ETH::set_current(double ValF) throw (yat::Exception)
+{
+try{
+	std::ostringstream oss;
+
+	oss<<"source:current "<<ValF<<"\n";
+
+	sock << oss.str();
+}
+catch(yat::Exception &e)
+{
+	std::ostringstream Desc;
+	Desc<<"YAT exception caught on magnet with ip: "<<this->ip_address<<std::ends;
+	e.push_error("Current could not be set",Desc.str(), "PSC_ETH::set_current");
+	throw e;
+}
+catch(...)
+{
+	std::ostringstream Desc;
+	Desc<<"Unknown exception caught on magnet with ip: "<<this->ip_address<<std::ends;
+	yat::Exception e("Unknown error",Desc.str(),"PSC_ETH::set_current");
+	throw e; 
+}
 }
 
 void PSC_ETH::set_current_buffer(float *valF,int index,int count)

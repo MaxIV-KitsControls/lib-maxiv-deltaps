@@ -22,8 +22,9 @@
 
 using namespace std;
 PSC_ETH *Magnet=0;
-struct idata myDataX_Magnet1;
 
+//forward declarations
+void display_pole(PSC_ETH* pole);
 
 /* Return 1 if the difference is negative, otherwise 0.  */
 long int timeval_subtract(struct timeval *result, struct timeval *t2, struct timeval *t1)
@@ -34,14 +35,14 @@ long int timeval_subtract(struct timeval *result, struct timeval *t2, struct tim
 
     return diff;
 }
-
+/*
 void test0()
 {
 
 	try{
 		std::cout<<"---------------TEST0---------------"<<std::endl;
 
-		/** Test the software trigger and the ramping of the current**/
+		// Test the software trigger and the ramping of the current
 
 		Magnet = new PSC_ETH("192.168.150.101");
 		
@@ -77,21 +78,21 @@ void test0()
 		}
 		delete Magnet;
 	}
-}
-void test1()
+}*/
+void test1(std::string ip)
 {
 
 	try{
 		std::cout<<"---------------TEST1---------------"<<std::endl;
 
-		/** 	Set current
+		//	Set current
 		//	Set state to ON
 		//	Print state
 		//	Set state to OFF
 		//	Print the current, voltage and state, (fail etc) 	
-		**/
+		
 
-		Magnet = new PSC_ETH("192.168.150.101");
+		Magnet = new PSC_ETH(ip);
 		std::cout<<Magnet->addrIP()<<std::endl;
 		Magnet->set_current(1);
 		std::cout<<"CURRENT SETTING:"<<1<<std::endl;
@@ -102,20 +103,11 @@ void test1()
 
 		std::cout<<"STATE :"<<Magnet->get_state()<<std::endl;
 
-		Magnet->get_idata(&myDataX_Magnet1);
-
 		Magnet->set_state(0);
 
-		delete Magnet;
+		display_pole(Magnet);
 
-		std::cout<<"---------------IDATA---------------"<<std::endl;
-		std::cout<<"MAGNET :"<<myDataX_Magnet1.magnet<<std::endl;
-		std::cout<<"POLE :"<<myDataX_Magnet1.pole<<std::endl;
-		std::cout<<"STATE :"<<myDataX_Magnet1.state<<std::endl;
-		std::cout<<"FAIL :"<<myDataX_Magnet1.fail<<std::endl;
-		std::cout<<"MEASVOLT :"<<myDataX_Magnet1.measvolt<<std::endl;
-		std::cout<<"MEASCURR :"<<myDataX_Magnet1.meascurr<<std::endl;
-		std::cout<<"-----------------------------------"<<std::endl;
+		delete Magnet;		
 
 	}
 	catch(yat::Exception &e)
@@ -128,13 +120,13 @@ void test1()
 		delete Magnet;
 	}	
 }
-
-bool test2()
+/*
+bool test2(std::string ip)
 {
 	bool result=false;
 	try{
 		std::cout<<"---------------TEST2---------------"<<std::endl;
-		/**	Software trigger timing test 
+		//	Software trigger timing test 
 		//	Enable trigger
 		// 	Set state to ON
 		//	Set current
@@ -156,8 +148,8 @@ bool test2()
 		//	Print the read current until it is stabilized
 		//	Print the current, voltage and state, (fail etc) 
 		//	Set state to OFF
-		*/
-		Magnet = new PSC_ETH("192.168.150.101");
+		
+		Magnet = new PSC_ETH(ip);
 		Magnet->clear_all_err();
 		Magnet->set_trigger_state(TRIGGER_STATE_ON);
 		Magnet->set_state(MAGNET_ON);
@@ -176,17 +168,7 @@ bool test2()
 		}while(!Magnet->get_current_tracking_status());
 		std::cout<<std::endl;
 		//-------------------------------------------------------------------
-		Magnet->get_idata(&myDataX_Magnet1);
-
-		std::cout<<"---------------IDATA---------------"<<std::endl;
-		std::cout<<"MAGNET :"<<myDataX_Magnet1.magnet<<std::endl;
-		std::cout<<"POLE :"<<myDataX_Magnet1.pole<<std::endl;
-		std::cout<<"STATE :"<<myDataX_Magnet1.state<<std::endl;
-		std::cout<<"FAIL :"<<myDataX_Magnet1.fail<<std::endl;
-		std::cout<<"MEASVOLT :"<<myDataX_Magnet1.measvolt<<std::endl;
-		std::cout<<"MEASCURR :"<<myDataX_Magnet1.meascurr<<std::endl;
-		std::cout<<"MEASCURR :"<<Magnet->get_measure_current()<<std::endl;
-		std::cout<<"-----------------------------------"<<std::endl;
+		display_pole(Magnet);
 
 		Magnet->set_current_latch(-2.65432);
 		std::cout<<"CURRENT TRIGGER SETTING:"<<-2.65432<<std::endl;
@@ -204,17 +186,7 @@ bool test2()
 		}while(!Magnet->get_current_tracking_status());
 		std::cout<<std::endl;
 		//-------------------------------------------------------------------
-		Magnet->get_idata(&myDataX_Magnet1);
-
-		std::cout<<"---------------IDATA---------------"<<std::endl;
-		std::cout<<"MAGNET :"<<myDataX_Magnet1.magnet<<std::endl;
-		std::cout<<"POLE :"<<myDataX_Magnet1.pole<<std::endl;
-		std::cout<<"STATE :"<<myDataX_Magnet1.state<<std::endl;
-		std::cout<<"FAIL :"<<myDataX_Magnet1.fail<<std::endl;
-		std::cout<<"MEASVOLT :"<<myDataX_Magnet1.measvolt<<std::endl;
-		std::cout<<"MEASCURR :"<<myDataX_Magnet1.meascurr<<std::endl;
-		std::cout<<"MEASCURR :"<<Magnet->get_measure_current()<<std::endl;
-		std::cout<<"-----------------------------------"<<std::endl;
+		display_pole(Magnet);
 
 		Magnet->set_current_latch(5);
 		std::cout<<"CURRENT TRIGGER SETTING:"<<5<<std::endl;
@@ -230,17 +202,7 @@ bool test2()
 		}while(!Magnet->get_current_tracking_status());
 		std::cout<<std::endl;
 		//-------------------------------------------------------------------
-		Magnet->get_idata(&myDataX_Magnet1);
-
-		std::cout<<"---------------IDATA---------------"<<std::endl;
-		std::cout<<"MAGNET :"<<myDataX_Magnet1.magnet<<std::endl;
-		std::cout<<"POLE :"<<myDataX_Magnet1.pole<<std::endl;
-		std::cout<<"STATE :"<<myDataX_Magnet1.state<<std::endl;
-		std::cout<<"FAIL :"<<myDataX_Magnet1.fail<<std::endl;
-		std::cout<<"MEASVOLT :"<<myDataX_Magnet1.measvolt<<std::endl;
-		std::cout<<"MEASCURR :"<<myDataX_Magnet1.meascurr<<std::endl;
-		std::cout<<"MEASCURR :"<<Magnet->get_measure_current()<<std::endl;
-		std::cout<<"-----------------------------------"<<std::endl;
+		display_pole(Magnet);
 
 		Magnet->set_state(MAGNET_OFF);	
 
@@ -264,7 +226,7 @@ bool test3()
 	try{
 		std::cout<<"---------------TEST3---------------"<<std::endl;
 
-		/**	Hardware trigger timing test
+		//	Hardware trigger timing test
 		//	Enable trigger
 		// 	Set state to ON
 		//	Set current
@@ -281,7 +243,7 @@ bool test3()
 		//	Print the read current until it is stabilized
 		//	Print the current, voltage and state, (fail etc) 
 		//	Set state to OFF
-		*/
+		
 
 		Magnet = new PSC_ETH("192.168.150.101");
 		Magnet->clear_all_err();
@@ -301,17 +263,7 @@ bool test3()
 		}while(!Magnet->get_current_tracking_status());
 		std::cout<<std::endl;
 		//-------------------------------------------------------------------
-		Magnet->get_idata(&myDataX_Magnet1);
-
-		std::cout<<"---------------IDATA---------------"<<std::endl;
-		std::cout<<"MAGNET :"<<myDataX_Magnet1.magnet<<std::endl;
-		std::cout<<"POLE :"<<myDataX_Magnet1.pole<<std::endl;
-		std::cout<<"STATE :"<<myDataX_Magnet1.state<<std::endl;
-		std::cout<<"FAIL :"<<myDataX_Magnet1.fail<<std::endl;
-		std::cout<<"MEASVOLT :"<<myDataX_Magnet1.measvolt<<std::endl;
-		std::cout<<"MEASCURR :"<<myDataX_Magnet1.meascurr<<std::endl;
-		std::cout<<"MEASCURR :"<<Magnet->get_measure_current()<<std::endl;
-		std::cout<<"-----------------------------------"<<std::endl;
+		display_pole(Magnet);
 
 		Magnet->set_current_latch(-2.65432);
 		std::cout<<"CURRENT TRIGGER SETTING:"<<-2.65432<<std::endl;
@@ -328,17 +280,7 @@ bool test3()
 		}while(!Magnet->get_current_tracking_status());
 		std::cout<<std::endl;
 		//-------------------------------------------------------------------
-		Magnet->get_idata(&myDataX_Magnet1);
-
-		std::cout<<"---------------IDATA---------------"<<std::endl;
-		std::cout<<"MAGNET :"<<myDataX_Magnet1.magnet<<std::endl;
-		std::cout<<"POLE :"<<myDataX_Magnet1.pole<<std::endl;
-		std::cout<<"STATE :"<<myDataX_Magnet1.state<<std::endl;
-		std::cout<<"FAIL :"<<myDataX_Magnet1.fail<<std::endl;
-		std::cout<<"MEASVOLT :"<<myDataX_Magnet1.measvolt<<std::endl;
-		std::cout<<"MEASCURR :"<<myDataX_Magnet1.meascurr<<std::endl;
-		std::cout<<"MEASCURR :"<<Magnet->get_measure_current()<<std::endl;
-		std::cout<<"-----------------------------------"<<std::endl;
+		display_pole(Magnet);
 
 		Magnet->set_state(MAGNET_OFF);	
 	
@@ -357,28 +299,26 @@ bool test3()
 
 	return result;
 }
-
-bool test4()
+*/
+bool test4(std::string ip)
 {
 	bool result=false;
 
 	try{
 		std::cout<<"---------------TEST4---------------"<<std::endl;
-		Magnet = new PSC_ETH("192.168.150.101");
-		std::cout<<Magnet->addrIP()<<std::endl;
-
+		
+		//	Print the current, voltage and state, (fail etc)
+		//	Set current
+		//	Set state to ON
+		//	Print the current, voltage and state, (fail etc)
+		//	wait
+		//	Print the current, voltage and state, (fail etc)
+		
+		Magnet = new PSC_ETH(ip);
+		
 		//-------------------------------------------------------------------
-		Magnet->get_idata(&myDataX_Magnet1);
-
-		std::cout<<"---------------IDATA---------------"<<std::endl;
-		std::cout<<"MAGNET :"<<myDataX_Magnet1.magnet<<std::endl;
-		std::cout<<"POLE :"<<myDataX_Magnet1.pole<<std::endl;
-		std::cout<<"STATE :"<<myDataX_Magnet1.state<<std::endl;
-		std::cout<<"FAIL :"<<myDataX_Magnet1.fail<<std::endl;
-		std::cout<<"MEASVOLT :"<<myDataX_Magnet1.measvolt<<std::endl;
-		std::cout<<"MEASCURR :"<<myDataX_Magnet1.meascurr<<std::endl;
-		std::cout<<"MEASCURR :"<<Magnet->get_measure_current()<<std::endl;
-		std::cout<<"-----------------------------------"<<std::endl;
+		
+		display_pole(Magnet);
 
 		sleep(5);
 		Magnet->set_current(3);
@@ -386,32 +326,14 @@ bool test4()
 		Magnet->set_state(MAGNET_ON);
 
 		//-------------------------------------------------------------------
-		Magnet->get_idata(&myDataX_Magnet1);
-
-		std::cout<<"---------------IDATA---------------"<<std::endl;
-		std::cout<<"MAGNET :"<<myDataX_Magnet1.magnet<<std::endl;
-		std::cout<<"POLE :"<<myDataX_Magnet1.pole<<std::endl;
-		std::cout<<"STATE :"<<myDataX_Magnet1.state<<std::endl;
-		std::cout<<"FAIL :"<<myDataX_Magnet1.fail<<std::endl;
-		std::cout<<"MEASVOLT :"<<myDataX_Magnet1.measvolt<<std::endl;
-		std::cout<<"MEASCURR :"<<myDataX_Magnet1.meascurr<<std::endl;
-		std::cout<<"MEASCURR :"<<Magnet->get_measure_current()<<std::endl;
-		std::cout<<"-----------------------------------"<<std::endl;
+		display_pole(Magnet);
+		
 		
 		sleep(5);
 
 		//-------------------------------------------------------------------
-		Magnet->get_idata(&myDataX_Magnet1);
+		display_pole(Magnet);
 
-		std::cout<<"---------------IDATA---------------"<<std::endl;
-		std::cout<<"MAGNET :"<<myDataX_Magnet1.magnet<<std::endl;
-		std::cout<<"POLE :"<<myDataX_Magnet1.pole<<std::endl;
-		std::cout<<"STATE :"<<myDataX_Magnet1.state<<std::endl;
-		std::cout<<"FAIL :"<<myDataX_Magnet1.fail<<std::endl;
-		std::cout<<"MEASVOLT :"<<myDataX_Magnet1.measvolt<<std::endl;
-		std::cout<<"MEASCURR :"<<myDataX_Magnet1.meascurr<<std::endl;
-		std::cout<<"MEASCURR :"<<Magnet->get_measure_current()<<std::endl;
-		std::cout<<"-----------------------------------"<<std::endl;
 		
 		delete Magnet;
 	}
@@ -428,7 +350,7 @@ bool test4()
 	return result;
 }
 
-void init_pole(PSC_ETH* pole)
+/*void init_pole(PSC_ETH* pole)
 {
 	pole->clear_all_err();
 	pole->set_trigger_state(TRIGGER_STATE_ON);
@@ -443,13 +365,13 @@ void init_pole(PSC_ETH* pole)
 	}while(!pole->get_current_tracking_status());
 	std::cout<<std::endl;
 }
-
+*/
 void release_pole(PSC_ETH* pole)
 {
 	sleep(2);
 	pole->set_state(MAGNET_OFF);
 }
-
+/*
 void display_counter(PSC_ETH* pole)
 {
 	int ctn1,ctn2;
@@ -457,42 +379,20 @@ void display_counter(PSC_ETH* pole)
 	std::cout<<"---------------CTN---------------"<<std::endl;
 	std::cout<<"CTN3 :"<<ctn1<<std::endl;
 	std::cout<<"CTN4 :"<<ctn2<<std::endl;
-}
+}*/
 
 void display_pole(PSC_ETH* pole)
 {
 
-	pole->get_idata(&myDataX_Magnet1);
-
-	std::cout<<"---------------IDATA---------------"<<std::endl;
-	std::cout<<"MAGNET :"<<myDataX_Magnet1.magnet<<std::endl;
-	std::cout<<"POLE :"<<myDataX_Magnet1.pole<<std::endl;
-	std::cout<<"STATE :"<<myDataX_Magnet1.state<<std::endl;
-	std::cout<<"FAIL :"<<myDataX_Magnet1.fail<<std::endl;
-	std::cout<<"MEASVOLT :"<<myDataX_Magnet1.measvolt<<std::endl;
-	std::cout<<"MEASCURR :"<<myDataX_Magnet1.meascurr<<std::endl;
+	std::cout<<"---------------MAGNET STATUS---------------"<<std::endl;
+	std::cout<<"MAGNET :"<<pole->addrIP()<<std::endl;
+	std::cout<<"STATE :"<<pole->get_state()<<std::endl;
+	std::cout<<"FAIL :"<<pole->read_error()<<std::endl;
+	std::cout<<"MEASVOLT :"<<pole->get_measure_voltage()<<std::endl;
 	std::cout<<"MEASCURR :"<<pole->get_measure_current()<<std::endl;
 	std::cout<<"-----------------------------------"<<std::endl;
-}
-
-void wait_slope_completion(PSC_ETH* pole)
-{
-	std::cout<<"WAIT CURRENT SLOPE COMPLETION "<<std::endl;
-	do{
-		std::cout << "\r" << "Current :" << pole->get_measure_current();
-	}while( !pole->get_current_slope_completion() );
-	std::cout<<std::endl;
 
 }
-void wait_tracking(PSC_ETH* pole)
-{
-	std::cout<<"WAIT CURRENT TRACKING COMPLETION "<<std::endl;
-	do{
-		std::cout << "\r" << "Current :" << pole->get_measure_current();
-	}while( !pole->get_current_tracking_status() );
-	std::cout<<std::endl;
-}
-
 
 void display_current(PSC_ETH* pole)
 {
@@ -552,6 +452,7 @@ main (int argc, char **argv)
 	int val=0;
 	if(argc>1)
 	{
+	try{
 		// Display the current current of one pole
 		if(strcmp(argv[1],"display-current")==0 && argc>3)
 		{
@@ -587,9 +488,39 @@ main (int argc, char **argv)
 			// In case of ...
 			delete pole;
 		}
-		else if(strcmp(argv[1],"test-4")==0 && argc>3)	
+		else if(strcmp(argv[1],"test-1")==0 && argc>2)	
 		{
+			std::cout << "Test-1 ip="<<argv[2]<<std::endl;
+			std::string ip = argv[2]; 
+
+			test1(ip.c_str());
 		}
+		else if(strcmp(argv[1],"test-4")==0 && argc>2)	
+		{
+			std::cout << "Test-4 ip="<<argv[2]<<std::endl;
+			std::string ip = argv[2]; 
+
+			test4(ip.c_str());
+		}
+	}
+	catch (const yat::SocketException &se)
+	{
+		std::cout << "*** yat::SocketException caught ***" << std::endl;
+
+	    for (size_t err = 0; err  < se.errors.size(); err++)
+	    {
+	      std::cout << "Err-" << err << "::reason..." << se.errors[err].reason << std::endl;
+	      std::cout << "Err-" << err << "::desc....." << se.errors[err].desc << std::endl;
+	      std::cout << "Err-" << err << "::origin..." << se.errors[err].origin << std::endl;
+	      std::cout << "Err-" << err << "::code....." << se.errors[err].code << std::endl;
+	    }
+	    return -1;
+	}
+	catch (...)
+	{
+		std::cout << "Unknown exception caught" << std::endl;
+		return -1;
+	}
 	}
 	else
 	{
@@ -600,6 +531,7 @@ main (int argc, char **argv)
 		std::cout << "  Read the current as fast as possible with 1 socket" << std::endl;
 		std::cout << "  and display the response time of each request in us" << std::endl;
 		std::cout << "* display-current : " << std::endl;
+		std::cout << "* test-1 : " << std::endl;		
 		std::cout << "* test-4 : " << std::endl;
 		std::cout << std::endl;
 		std::cout << "   - Parameters are : IP" << std::endl;
