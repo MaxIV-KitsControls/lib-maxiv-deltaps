@@ -43,6 +43,9 @@ public:
 		double get_current_tracking_level(void) throw (yat::Exception);
 		void set_current_tracking_level(double ValF) throw (yat::Exception);
 
+		bool get_current_state(void) throw (yat::Exception);
+		bool get_voltage_state(void) throw (yat::Exception);
+
 		bool get_current_tracking_status(void) throw (yat::Exception);
 		bool get_current_slope_completion(void) throw (yat::Exception);
 

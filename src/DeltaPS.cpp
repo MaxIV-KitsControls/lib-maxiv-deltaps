@@ -46,10 +46,83 @@ double PSC_ETH::max_voltage() {
 	i >> d;
 	return d;
 }
+//---------------------------------------------------------------------------
+//Read the Status:Operation:Regulating:Condition register
+//bit 1 = Constant current
+//---------------------------------- 
+bool PSC_ETH::get_current_state(void) throw (yat::Exception)
+{
+try{
+	std::string reply;
+	int d;
+	bool state = false;
 
+	sock << "status:operation:regulating:condition?\n";
+	sock >> reply;
+
+	std::istringstream i(reply);
+	i >> d;
+	if (d > 1)
+		state = true;
+	return state;
+}
+catch(yat::Exception &e)
+{
+	std::ostringstream Desc;
+	Desc<<"YAT exception caught on magnet with ip: "<<this->ip_address<<std::ends;
+	e.push_error("State could not be read",Desc.str(), "PSC_ETH::get_current_state");
+	throw e;
+}
+catch(...)
+{
+	std::ostringstream Desc;
+	Desc<<"Unknown exception caught on magnet with ip: "<<this->ip_address<<std::ends;
+	yat::Exception e("Unknown error",Desc.str(),"PSC_ETH::get_current_state");
+	throw e; 
+}
+}
+//---------------------------------------------------------------------------
+//Read the Status:Operation:Regulating:Condition register
+//bit 0 = Constant voltage
+//---------------------------------- 
+bool PSC_ETH::get_voltage_state(void) throw (yat::Exception)
+{
+try{
+	std::string reply;
+	int d;
+	bool state = false;
+
+	sock << "status:operation:regulating:condition?\n";
+	sock >> reply;
+
+	std::istringstream i(reply);
+	i >> d;
+	if(d == 1 || d == 3)
+		state = true;
+	
+	return state;
+}
+catch(yat::Exception &e)
+{
+	std::ostringstream Desc;
+	Desc<<"YAT exception caught on magnet with ip: "<<this->ip_address<<std::ends;
+	e.push_error("State could not be read",Desc.str(), "PSC_ETH::get_voltage_state");
+	throw e;
+}
+catch(...)
+{
+	std::ostringstream Desc;
+	Desc<<"Unknown exception caught on magnet with ip: "<<this->ip_address<<std::ends;
+	yat::Exception e("Unknown error",Desc.str(),"PSC_ETH::get_voltage_state");
+	throw e; 
+}
+}
 //---------------------------------------------------------------------------
 //Read the Status:Operation:Shutdown:Condition register
-//0=OFF;1=ON;2=WARNING;3=ALARM
+//bit 0 = protection summary
+//bit 1 = interlock
+//bit 2 = RSD
+//bit 3 = Output On/Off
 //---------------------------------- 
 int PSC_ETH::get_state(void) throw (yat::Exception)
 {
@@ -62,6 +135,7 @@ try{
 
 	std::istringstream i(reply);
 	i >> d;
+	//TODO: split reply bitwise
 	return d;
 }
 catch(yat::Exception &e)
@@ -80,6 +154,8 @@ catch(...)
 }
 }
 //---------------------------------------------------------------------------
+//Set Output state to On or Off
+//------------------------------
 void PSC_ETH::set_state(bool val) throw (yat::Exception)
 {
 try{
