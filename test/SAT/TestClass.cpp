@@ -40,6 +40,9 @@ void test0()
 
 	try{
 		std::cout<<"---------------TEST0---------------"<<std::endl;
+
+		/** Test the software trigger and the ramping of the current**/
+
 		Magnet = new PSC_ETH("192.168.150.101");
 		
 		std::cout<<Magnet->addrIP()<<std::endl;
@@ -54,8 +57,8 @@ void test0()
 		Magnet->set_current_latch_source(CURR_LATCH_SOURCE_BUFFER);
 		Magnet->set_state(MAGNET_ON);
 		sleep(1);
-		//initiate_udp_trigger("192.168.150.255");
-
+		Magnet->send_software_trigger();
+		
 		while(getchar() != 'q')
 			std::cout<<"\r"<<"MEASCURR1 :"<<Magnet->get_measure_current();
 		std::cout<<std::endl;
@@ -80,6 +83,14 @@ void test1()
 
 	try{
 		std::cout<<"---------------TEST1---------------"<<std::endl;
+
+		/** 	Set current
+		//	Set state to ON
+		//	Print state
+		//	Set state to OFF
+		//	Print the current, voltage and state, (fail etc) 	
+		**/
+
 		Magnet = new PSC_ETH("192.168.150.101");
 		std::cout<<Magnet->addrIP()<<std::endl;
 		Magnet->set_current(1);
@@ -123,6 +134,29 @@ bool test2()
 	bool result=false;
 	try{
 		std::cout<<"---------------TEST2---------------"<<std::endl;
+		/**	Software trigger timing test 
+		//	Enable trigger
+		// 	Set state to ON
+		//	Set current
+		//	Print set current
+		//	Set current tracking level (stabilisation range)
+		// 	Print the read current until the set value is reached
+		//	Print the read current until it is stabilized
+		//	Print the current, voltage and state, (fail etc) 
+		//	Latch the current set point
+		//	Set trigger delay 3
+		//	Send software trigger 
+		// 	Print the read current until the set value is reached
+		//	Print the read current until it is stabilized
+		//	Print the current, voltage and state, (fail etc) 
+		//	Latch the current set point
+		//	Set trigger delay 0
+		//	Send software trigger 
+		// 	Print the read current until the set value is reached
+		//	Print the read current until it is stabilized
+		//	Print the current, voltage and state, (fail etc) 
+		//	Set state to OFF
+		*/
 		Magnet = new PSC_ETH("192.168.150.101");
 		Magnet->clear_all_err();
 		Magnet->set_trigger_state(TRIGGER_STATE_ON);
@@ -209,11 +243,6 @@ bool test2()
 		std::cout<<"-----------------------------------"<<std::endl;
 
 		Magnet->set_state(MAGNET_OFF);	
-		int ctn1,ctn2;
-		Magnet->get_ctn(&ctn1,&ctn2);
-		std::cout<<"---------------CTN---------------"<<std::endl;
-		std::cout<<"CTN3 :"<<ctn1<<std::endl;
-		std::cout<<"CTN4 :"<<ctn2<<std::endl;
 
 		delete Magnet;
 	}
@@ -234,6 +263,26 @@ bool test3()
 	bool result=false;
 	try{
 		std::cout<<"---------------TEST3---------------"<<std::endl;
+
+		/**	Hardware trigger timing test
+		//	Enable trigger
+		// 	Set state to ON
+		//	Set current
+		//	Print set current
+		//	Set current tracking level (stabilisation range)
+		// 	Print the read current until the set value is reached
+		//	Print the read current until it is stabilized
+		//	Print the current, voltage and state, (fail etc) 
+		//	Latch the current set point
+		//	Set trigger delay 3
+		//	Send hardware trigger
+		//	Wait for current to start changing 
+		// 	Print the read current until the set value is reached
+		//	Print the read current until it is stabilized
+		//	Print the current, voltage and state, (fail etc) 
+		//	Set state to OFF
+		*/
+
 		Magnet = new PSC_ETH("192.168.150.101");
 		Magnet->clear_all_err();
 		Magnet->set_trigger_state(TRIGGER_STATE_ON);
@@ -292,11 +341,7 @@ bool test3()
 		std::cout<<"-----------------------------------"<<std::endl;
 
 		Magnet->set_state(MAGNET_OFF);	
-		int ctn1,ctn2;
-		Magnet->get_ctn(&ctn1,&ctn2);
-		std::cout<<"---------------CTN---------------"<<std::endl;
-		std::cout<<"CTN3 :"<<ctn1<<std::endl;
-		std::cout<<"CTN4 :"<<ctn2<<std::endl;
+	
 
 		delete Magnet;
 	}
@@ -542,7 +587,9 @@ main (int argc, char **argv)
 			// In case of ...
 			delete pole;
 		}
-		
+		else if(strcmp(argv[1],"test-4")==0 && argc>3)	
+		{
+		}
 	}
 	else
 	{
@@ -552,11 +599,13 @@ main (int argc, char **argv)
 		std::cout << "* display-request-rate : " << std::endl;
 		std::cout << "  Read the current as fast as possible with 1 socket" << std::endl;
 		std::cout << "  and display the response time of each request in us" << std::endl;
+		std::cout << "* display-current : " << std::endl;
+		std::cout << "* test-4 : " << std::endl;
 		std::cout << std::endl;
-		std::cout << "   - Parameters are : IP POLE_NUMBER" << std::endl;
+		std::cout << "   - Parameters are : IP" << std::endl;
 		std::cout << std::endl;
-		std::cout << "Example $> TestMagnet display-request-rate 192.168.150.107 2" << std::endl;
-		std::cout << "        > Current display (pole=2;ip=192.168.150.107)" << std::endl;
+		std::cout << "Example $> TestMagnet display-request-rate 192.168.150.107" << std::endl;
+		std::cout << "        > Current display (ip=192.168.150.107)" << std::endl;
 		std::cout << "        > Time to serve (0/25363): 1955             " << std::endl;
 		std::cout << "                         |   |      + response time in us " << std::endl;
 		std::cout << "                         |   + number of try               " << std::endl;

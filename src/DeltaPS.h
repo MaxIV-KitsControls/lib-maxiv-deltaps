@@ -17,8 +17,6 @@
 #define CURR_LATCH_SOURCE_VALUE	0
 #define CURR_LATCH_SOURCE_BUFFER 1
 
-extern void initiate_udp_trigger(const char *_mask);
-
 class PSC_ETH
 {
 public:
@@ -29,6 +27,8 @@ public:
 	std::string idn();
 	double max_voltage();
 	std::string addrIP(void){return ip_address;}
+
+	void send_software_trigger();
 
 		//current
 		double get_measure_current(void) throw (yat::Exception);
@@ -86,7 +86,6 @@ private:
 	yat::ClientSocket sock;
 	std::string ip_address;
 };
-
 struct idata{
 	int magnet;
 	int pole;
@@ -95,4 +94,5 @@ struct idata{
 	double measvolt;
 	double meascurr;
 };
+
 #endif // _DELTAPS_H_
