@@ -46,6 +46,29 @@ double PSC_ETH::max_voltage() {
 	i >> d;
 	return d;
 }
+
+void PSC_ETH::set_max_voltage(double v) {
+try{	
+	std::ostringstream oss;
+
+	oss<< "source:voltage:maximum" << v << "\n";
+	sock << oss.str();
+}
+catch(yat::Exception &e)
+{
+	std::ostringstream Desc;
+	Desc<<"YAT exception caught on magnet with ip: "<<this->ip_address<<std::ends;
+	e.push_error("Max voltage could not be set",Desc.str(), "PSC_ETH::set_max_voltage");
+	throw e;
+}
+catch(...)
+{
+	std::ostringstream Desc;
+	Desc<<"Unknown exception caught on magnet with ip: "<<this->ip_address<<std::ends;
+	yat::Exception e("Unknown error",Desc.str(),"PSC_ETH::set_max_voltage");
+	throw e; 
+}
+}
 //---------------------------------------------------------------------------
 //Read the Status:Operation:Regulating:Condition register
 //bit 1 = Constant current
@@ -126,7 +149,7 @@ catch(...)
 //---------------------------------- 
 int PSC_ETH::get_state(void) throw (yat::Exception)
 {
-try{
+try{/*
 	std::string reply;
 	int d;
 
@@ -137,6 +160,16 @@ try{
 	i >> d;
 	//TODO: split reply bitwise
 	return d;
+*/
+	std::string reply;
+	int d;
+
+	sock << "OUTPUT?\n";
+	sock >> reply;
+	std::istringstream i(reply);
+	i >> d;
+	return d;
+	
 }
 catch(yat::Exception &e)
 {
@@ -161,7 +194,7 @@ void PSC_ETH::set_state(bool val) throw (yat::Exception)
 try{
 	std::ostringstream oss;
 
-	oss<<"output" << val << "\n"; 
+	oss<<"output " << val << "\n"; 
 	sock << oss.str();
 }
 catch(yat::Exception &e)
@@ -193,8 +226,8 @@ try{
 	}
 	std::string result;
 
-	sock << "system:error?\n";
-	sock >> result;
+	//sock << "system:error?\n";
+	//sock >> result;
 
 	return result;
 }

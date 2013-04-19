@@ -321,7 +321,10 @@ bool test4(std::string ip)
 		display_pole(Magnet);
 
 		sleep(5);
-		Magnet->set_current(3);
+		Magnet->set_max_voltage(20);
+		sleep(2);
+		std::cout<<"MAX Voltage :"<<Magnet->max_voltage()<<std::endl;
+		Magnet->set_current(0.1);
 
 		Magnet->set_state(MAGNET_ON);
 
@@ -334,7 +337,8 @@ bool test4(std::string ip)
 		//-------------------------------------------------------------------
 		display_pole(Magnet);
 
-		
+		Magnet->set_state(MAGNET_OFF);
+
 		delete Magnet;
 	}
 	catch(yat::Exception &e)
@@ -350,22 +354,22 @@ bool test4(std::string ip)
 	return result;
 }
 
-/*void init_pole(PSC_ETH* pole)
+void init_pole(PSC_ETH* pole)
 {
 	pole->clear_all_err();
-	pole->set_trigger_state(TRIGGER_STATE_ON);
-	pole->set_state(MAGNET_ON);
-	pole->set_current(0);
+	//pole->set_trigger_state(TRIGGER_STATE_ON);
+	//pole->set_state(MAGNET_ON);
+	//pole->set_current(0);
 
 	
-	pole->set_current_tracking_level(50e-6);	
+	//pole->set_current_tracking_level(50e-6);	
 	//-------------------------------------------------------------------	
-	do{
-		std::cout<<"\r"<<"MEASCURR1 :"<<pole->get_measure_current();
-	}while(!pole->get_current_tracking_status());
-	std::cout<<std::endl;
+	//do{
+	//	std::cout<<"\r"<<"MEASCURR1 :"<<pole->get_measure_current();
+	//}while(!pole->get_current_tracking_status());
+	//std::cout<<std::endl;
 }
-*/
+
 void release_pole(PSC_ETH* pole)
 {
 	sleep(2);
@@ -446,6 +450,41 @@ void display_request_rate(PSC_ETH* pole)
 	}
 }
 
+void testtest(std::string ip)
+{
+	std::cout << "----------------Testing the test:-----------------"<<std::endl;
+	
+	PSC_ETH *pole = new PSC_ETH(ip);
+	
+
+	std::cout<<"MAGNET :"<<pole->addrIP()<<std::endl;
+
+	std::cout<<"All errors in buffer :"<<pole->read_error()<<std::endl;
+
+	std::cout<<"Read STATE :"<<pole->get_state()<<std::endl;
+	std::cout<<"Read FAIL :"<<pole->read_error()<<std::endl;
+
+	std::cout<<"Set STATE = 1"<<std::endl;
+	pole->set_state(MAGNET_ON);
+	sleep(2);
+	std::cout<<"Read STATE :"<<pole->get_state()<<std::endl;
+	std::cout<<"Read FAIL :"<<pole->read_error()<<std::endl;
+
+	
+	std::cout<<"Read MEASVOLT :"<<pole->get_measure_voltage()<<std::endl;
+	std::cout<<"Read MEASCURR :"<<pole->get_measure_current()<<std::endl;
+	
+	std::cout<<"Set STATE = 0:"<<std::endl;
+	pole->set_state(MAGNET_OFF);
+	sleep(2);
+	std::cout<<"Read STATE :"<<pole->get_state()<<std::endl;
+	std::cout<<"Read FAIL :"<<pole->read_error()<<std::endl;
+
+	std::cout<<"-----------------------------------"<<std::endl;
+
+	delete pole;
+	
+}
 
 main (int argc, char **argv)
 { 
@@ -501,6 +540,13 @@ main (int argc, char **argv)
 			std::string ip = argv[2]; 
 
 			test4(ip.c_str());
+		}
+		else if(strcmp(argv[1],"testtest")==0 && argc>2)	
+		{
+			std::cout << "Test Test ip="<<argv[2]<<std::endl;
+			std::string ip = argv[2]; 
+
+			testtest(ip.c_str());
 		}
 	}
 	catch (const yat::SocketException &se)

@@ -26,6 +26,7 @@ public:
 
 	std::string idn();
 	double max_voltage();
+	void set_max_voltage(double v);
 	std::string addrIP();
 
 	void send_software_trigger();
