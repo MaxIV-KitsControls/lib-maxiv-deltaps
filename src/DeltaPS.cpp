@@ -1,4 +1,6 @@
 #include "DeltaPS.h"
+#include <string>
+#include <cmath>
 
 #define LF "\10"
 
@@ -13,7 +15,29 @@ PSC_ETH::PSC_ETH(const std::string ip_address) {
     sock.set_option(yat::Socket::SOCK_OPT_ITIMEOUT, 1000);
 
     yat::Address addr(ip_address, SOCK_PORT);
+try{
     sock.connect(addr);
+}
+catch(yat::Exception &e)
+{
+	std::ostringstream Desc;
+	Desc<<"YAT exception caught on magnet with ip: "<<this->ip_address<<std::ends;
+	e.push_error("Failed to connect",Desc.str(), "PSC_ETH::Constructor");
+	throw e;
+}
+catch(...)
+{
+	std::ostringstream Desc;
+	Desc<<"Unknown exception caught on magnet with ip: "<<this->ip_address<<std::ends;
+	yat::Exception e("Unknown error",Desc.str(),"PSC_ETH::Constructor");
+	throw e; 
+        
+}       
+    sock << "*idn?\n";
+    sock >> id;
+
+    ps_group = find_psgroup();
+    
 }
 
 PSC_ETH::~PSC_ETH() {
@@ -21,13 +45,62 @@ PSC_ETH::~PSC_ETH() {
     yat::Socket::terminate();
 }
 
-std::string PSC_ETH::idn() {
+std::string PSC_ETH::send_query(std::string query) {
 	std::string result;
-
-	sock << "*idn?\n";
+	std::ostringstream oss;
+try{
+	oss << query << "\n";
+	sock << oss.str();
 	sock >> result;
 
 	return result;
+}
+catch(yat::Exception &e)
+{
+	std::ostringstream Desc;
+	Desc<<"YAT exception caught on magnet with ip: "<<this->ip_address<<std::ends;
+	e.push_error("Query could not be sent",Desc.str(), "PSC_ETH::send_query");
+	throw e;
+}
+catch(...)
+{
+	std::ostringstream Desc;
+	Desc<<"Unknown exception caught on magnet with ip: "<<this->ip_address<<std::ends;
+	yat::Exception e("Unknown error",Desc.str(),"PSC_ETH::send_query");
+	throw e; 
+}
+}
+
+std::string PSC_ETH::idn() {
+	return id;
+}
+
+int PSC_ETH::get_ps_group()
+{
+    return ps_group;
+}
+
+int PSC_ETH::find_psgroup()
+{
+    int group = 0;
+    
+    if(id.find("P179") != std::string::npos)
+    {
+        group = PSGROUP_1;
+    }
+    else if(id.find("P150") != std::string::npos)
+    {
+        group = PSGROUP_1;
+    }
+    else if(id.find("P256") != std::string::npos)
+    {
+        group = PSGROUP_2;
+    }
+    else if(id.find("SM66_AR_110") != std::string::npos)
+    {
+        group = PSGROUP_3;
+    }
+    return group;
 }
 
 std::string PSC_ETH::addrIP()
@@ -35,7 +108,7 @@ std::string PSC_ETH::addrIP()
 	return ip_address;
 }
 
-double PSC_ETH::max_voltage() {
+double PSC_ETH::get_max_voltage() {
 	std::string reply;
 	double d;
 
@@ -51,7 +124,7 @@ void PSC_ETH::set_max_voltage(double v) {
 try{	
 	std::ostringstream oss;
 
-	oss<< "source:voltage:maximum" << v << "\n";
+	oss<< "source:voltage:maximum " << v << "\n";
 	sock << oss.str();
 }
 catch(yat::Exception &e)
@@ -69,24 +142,55 @@ catch(...)
 	throw e; 
 }
 }
-//---------------------------------------------------------------------------
-//Read the Status:Operation:Regulating:Condition register
-//bit 1 = Constant current
-//---------------------------------- 
-bool PSC_ETH::get_current_state(void) throw (yat::Exception)
-{
-try{
+double PSC_ETH::get_max_current() {
 	std::string reply;
-	int d;
-	bool state = false;
+	double d;
 
-	sock << "status:operation:regulating:condition?\n";
+	sock << "source:current:maximum?\n";
 	sock >> reply;
 
 	std::istringstream i(reply);
 	i >> d;
-	if (d > 1)
-		state = true;
+	return d;
+}
+
+void PSC_ETH::set_max_current(double v) {
+try{	
+	std::ostringstream oss;
+
+	oss<< "source:current:maximum " << v << "\n";
+	sock << oss.str();
+}
+catch(yat::Exception &e)
+{
+	std::ostringstream Desc;
+	Desc<<"YAT exception caught on magnet with ip: "<<this->ip_address<<std::ends;
+	e.push_error("Max voltage could not be set",Desc.str(), "PSC_ETH::set_max_current");
+	throw e;
+}
+catch(...)
+{
+	std::ostringstream Desc;
+	Desc<<"Unknown exception caught on magnet with ip: "<<this->ip_address<<std::ends;
+	yat::Exception e("Unknown error",Desc.str(),"PSC_ETH::set_max_current");
+	throw e; 
+}
+}
+//---------------------------------------------------------------------------
+//Poll to see if requested current value is reached and stabilized
+//---------------------------------- 
+bool PSC_ETH::get_current_state(void) throw (yat::Exception)
+{
+try{
+	double meas_i, set_i;
+	bool state = false;
+
+	//compare measured current and set current
+        set_i = get_source_current();
+        meas_i = get_measure_current();
+        
+        state = std::abs(set_i - meas_i) < CURRENT_TOLERANCE;
+	
 	return state;
 }
 catch(yat::Exception &e)
@@ -105,23 +209,19 @@ catch(...)
 }
 }
 //---------------------------------------------------------------------------
-//Read the Status:Operation:Regulating:Condition register
-//bit 0 = Constant voltage
+//Poll to see if requested voltage value has been reached and stabilized
 //---------------------------------- 
 bool PSC_ETH::get_voltage_state(void) throw (yat::Exception)
 {
 try{
-	std::string reply;
-	int d;
+	double meas_v, set_v;
 	bool state = false;
 
-	sock << "status:operation:regulating:condition?\n";
-	sock >> reply;
-
-	std::istringstream i(reply);
-	i >> d;
-	if(d == 1 || d == 3)
-		state = true;
+	//compare measured voltage and set voltage
+        set_v = get_source_voltage();
+        meas_v = get_measure_voltage();
+        
+        state = std::abs(set_v - meas_v) < VOLTAGE_TOLERANCE;
 	
 	return state;
 }
@@ -147,29 +247,34 @@ catch(...)
 //bit 2 = RSD
 //bit 3 = Output On/Off
 //---------------------------------- 
-int PSC_ETH::get_state(void) throw (yat::Exception)
+int PSC_ETH::get_output_state(void) throw (yat::Exception)
 {
-try{/*
+try{
 	std::string reply;
-	int d;
+	int d= 0;
+	if(ps_group == PSGROUP_1)
+        {
+            return -1; //not supported
+        }
+        else if(ps_group == PSGROUP_2)
+        {
+            sock << "status:operation:shutdown:condition\n";
+            sock >> reply;
 
-	sock << "status:operation:shutdown:condition?\n";
-	sock >> reply;
+            std::istringstream i(reply);
+            i >> d;
+            if (d == 8)
+                d = 1;
+        }
+        else if(ps_group == PSGROUP_3)
+        {
+            sock << "OUTPUT?\n";
+            sock >> reply;
+            std::istringstream i(reply);
+            i >> d;
+        }
+       	return d;
 
-	std::istringstream i(reply);
-	i >> d;
-	//TODO: split reply bitwise
-	return d;
-*/
-	std::string reply;
-	int d;
-
-	sock << "OUTPUT?\n";
-	sock >> reply;
-	std::istringstream i(reply);
-	i >> d;
-	return d;
-	
 }
 catch(yat::Exception &e)
 {
@@ -189,13 +294,15 @@ catch(...)
 //---------------------------------------------------------------------------
 //Set Output state to On or Off
 //------------------------------
-void PSC_ETH::set_state(bool val) throw (yat::Exception)
+void PSC_ETH::set_output_state(bool val) throw (yat::Exception)
 {
 try{
-	std::ostringstream oss;
-
-	oss<<"output " << val << "\n"; 
-	sock << oss.str();
+        if(ps_group > 1)
+{
+            std::ostringstream oss;
+            oss << "output " << val << "\n";
+            sock << oss.str();
+        }
 }
 catch(yat::Exception &e)
 {
@@ -216,18 +323,10 @@ catch(...)
 std::string PSC_ETH::read_error(void) throw (yat::Exception)
 {
 try{
-	std::ostringstream oss;
-
-	oss<<"system:error?\n";
-
-	for(int i=0;i<5;i++)
-	{
-		sock << oss.str();	
-	}
 	std::string result;
 
-	//sock << "system:error?\n";
-	//sock >> result;
+	sock << "system:error?\n";
+	sock >> result;
 
 	return result;
 }
@@ -247,7 +346,7 @@ catch(...)
 }
 }
 //---------------------------------------------------------------------------
-//Empty error queue (has 5 slots)
+//Empty the error queue (has 5 slots)
 //----------------------------------
 void PSC_ETH::clear_all_err(void) throw (yat::Exception)
 {
@@ -362,12 +461,96 @@ catch(...)
 	throw e; 
 }
 }
-
-void PSC_ETH::set_current_buffer(float *valF,int index,int count)
+//---------------------------------------------------------------------------
+//Set the voltage
+//---------------------------------- 
+void PSC_ETH::set_voltage(double ValF) throw (yat::Exception)
 {
-//TODO: Implement a sequence in the ps controller
+try{
+	std::ostringstream oss;
+
+	oss<<"source:voltage "<<ValF<<"\n";
+
+	sock << oss.str();
+}
+catch(yat::Exception &e)
+{
+	std::ostringstream Desc;
+	Desc<<"YAT exception caught on magnet with ip: "<<this->ip_address<<std::ends;
+	e.push_error("Voltage could not be set",Desc.str(), "PSC_ETH::set_voltage");
+	throw e;
+}
+catch(...)
+{
+	std::ostringstream Desc;
+	Desc<<"Unknown exception caught on magnet with ip: "<<this->ip_address<<std::ends;
+	yat::Exception e("Unknown error",Desc.str(),"PSC_ETH::set_voltage");
+	throw e; 
+}
 }
 
+//---------------------------------------------------------------------------
+//Read the set current
+//---------------------------------- 
+double PSC_ETH::get_source_current(void) throw (yat::Exception)
+{
+ try{
+    double result;
+    std::string reply;
+    
+	sock<<"source:current?\n";
+        sock >> reply;
+
+	std::istringstream i(reply);
+	i >> result;
+        return result;
+}
+catch(yat::Exception &e)
+{
+	std::ostringstream Desc;
+	Desc<<"YAT exception caught on magnet with ip: "<<this->ip_address<<std::ends;
+	e.push_error("Source current could not be read",Desc.str(), "PSC_ETH::get_source_current");
+	throw e;
+}
+catch(...)
+{
+	std::ostringstream Desc;
+	Desc<<"Unknown exception caught on magnet with ip: "<<this->ip_address<<std::ends;
+	yat::Exception e("Unknown error",Desc.str(),"PSC_ETH::get_source_current");
+	throw e; 
+}  
+}
+//---------------------------------------------------------------------------
+//Read the set voltage
+//---------------------------------- 
+double PSC_ETH::get_source_voltage(void) throw (yat::Exception)
+{
+try{
+    double result;
+    std::string reply;
+    
+	sock<<"source:voltage?\n";
+        sock >> reply;
+
+	std::istringstream i(reply);
+	i >> result;
+        return result;
+}
+catch(yat::Exception &e)
+{
+	std::ostringstream Desc;
+	Desc<<"YAT exception caught on magnet with ip: "<<this->ip_address<<std::ends;
+	e.push_error("Source voltage could not be read",Desc.str(), "PSC_ETH::get_source_voltage");
+	throw e;
+}
+catch(...)
+{
+	std::ostringstream Desc;
+	Desc<<"Unknown exception caught on magnet with ip: "<<this->ip_address<<std::ends;
+	yat::Exception e("Unknown error",Desc.str(),"PSC_ETH::get_source_voltage");
+	throw e; 
+}
+}
 
 void PSC_ETH::send_software_trigger()
 {

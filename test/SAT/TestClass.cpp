@@ -56,7 +56,7 @@ void test0()
 
 		Magnet->set_trigger_state(TRIGGER_STATE_ON);
 		Magnet->set_current_latch_source(CURR_LATCH_SOURCE_BUFFER);
-		Magnet->set_state(MAGNET_ON);
+		Magnet->set_output_state(MAGNET_ON);
 		sleep(1);
 		Magnet->send_software_trigger();
 		
@@ -65,13 +65,13 @@ void test0()
 		std::cout<<std::endl;
 		Magnet->set_current_buffer_loop(1);
 		Magnet->set_current_latch_source(CURR_LATCH_SOURCE_VALUE);
-		Magnet->set_state(MAGNET_OFF);
+		Magnet->set_output_state(MAGNET_OFF);
 
 		delete Magnet;
 	}
 	catch(yat::Exception &e)
 	{
-		for(int i=0;i<e.errors.size();i++)		//gestion des exceptions empilées dans le vecteur d'erreur
+		for(int i=0;i<e.errors.size();i++)		//gestion des exceptions empilï¿½es dans le vecteur d'erreur
        		{
 			std::cout<<e.errors[i].reason<<" , "<<e.errors[i].desc<<" , "<<e.errors[i].origin<<" , "<<
 					e.errors[i].code<<std::endl;
@@ -97,13 +97,13 @@ void test1(std::string ip)
 		Magnet->set_current(1);
 		std::cout<<"CURRENT SETTING:"<<1<<std::endl;
 		Magnet->clear_all_err();
-		Magnet->set_state(1);
+		Magnet->set_output_state(1);
 
 		sleep(2);
 
-		std::cout<<"STATE :"<<Magnet->get_state()<<std::endl;
+		std::cout<<"STATE :"<<Magnet->get_output_state()<<std::endl;
 
-		Magnet->set_state(0);
+		Magnet->set_output_state(0);
 
 		display_pole(Magnet);
 
@@ -112,7 +112,7 @@ void test1(std::string ip)
 	}
 	catch(yat::Exception &e)
 	{
-		for(int i=0;i<e.errors.size();i++)		//gestion des exceptions empilées dans le vecteur d'erreur
+		for(int i=0;i<e.errors.size();i++)		//gestion des exceptions empilï¿½es dans le vecteur d'erreur
        		{
 			std::cout<<e.errors[i].reason<<" , "<<e.errors[i].desc<<" , "<<e.errors[i].origin<<" , "<<
 					e.errors[i].code<<std::endl;
@@ -152,7 +152,7 @@ bool test2(std::string ip)
 		Magnet = new PSC_ETH(ip);
 		Magnet->clear_all_err();
 		Magnet->set_trigger_state(TRIGGER_STATE_ON);
-		Magnet->set_state(MAGNET_ON);
+		Magnet->set_output_state(MAGNET_ON);
 
 		Magnet->set_current(1.12345);
 		std::cout<<"CURRENT SETTING:"<<1.12345<<std::endl;
@@ -204,13 +204,13 @@ bool test2(std::string ip)
 		//-------------------------------------------------------------------
 		display_pole(Magnet);
 
-		Magnet->set_state(MAGNET_OFF);	
+		Magnet->set_output_state(MAGNET_OFF);	
 
 		delete Magnet;
 	}
 	catch(yat::Exception &e)
 	{
-		for(int i=0;i<e.errors.size();i++)		//gestion des exceptions empilées dans le vecteur d'erreur
+		for(int i=0;i<e.errors.size();i++)		//gestion des exceptions empilï¿½es dans le vecteur d'erreur
        		{
 			std::cout<<e.errors[i].reason<<" , "<<e.errors[i].desc<<" , "<<e.errors[i].origin<<" , "<<
 					e.errors[i].code<<std::endl;
@@ -248,7 +248,7 @@ bool test3()
 		Magnet = new PSC_ETH("192.168.150.101");
 		Magnet->clear_all_err();
 		Magnet->set_trigger_state(TRIGGER_STATE_ON);
-		Magnet->set_state(MAGNET_ON);
+		Magnet->set_output_state(MAGNET_ON);
 
 		Magnet->set_current(1.12345);
 		std::cout<<"CURRENT SETTING:"<<1.12345<<std::endl;
@@ -282,14 +282,14 @@ bool test3()
 		//-------------------------------------------------------------------
 		display_pole(Magnet);
 
-		Magnet->set_state(MAGNET_OFF);	
+		Magnet->set_output_state(MAGNET_OFF);	
 	
 
 		delete Magnet;
 	}
 	catch(yat::Exception &e)
 	{
-		for(int i=0;i<e.errors.size();i++)		//gestion des exceptions empilées dans le vecteur d'erreur
+		for(int i=0;i<e.errors.size();i++)		//gestion des exceptions empilï¿½es dans le vecteur d'erreur
        		{
 			std::cout<<e.errors[i].reason<<" , "<<e.errors[i].desc<<" , "<<e.errors[i].origin<<" , "<<
 					e.errors[i].code<<std::endl;
@@ -323,10 +323,10 @@ bool test4(std::string ip)
 		sleep(5);
 		Magnet->set_max_voltage(20);
 		sleep(2);
-		std::cout<<"MAX Voltage :"<<Magnet->max_voltage()<<std::endl;
+		std::cout<<"MAX Voltage :"<<Magnet->get_max_voltage()<<std::endl;
 		Magnet->set_current(0.1);
 
-		Magnet->set_state(MAGNET_ON);
+		Magnet->set_output_state(MAGNET_ON);
 
 		//-------------------------------------------------------------------
 		display_pole(Magnet);
@@ -337,13 +337,13 @@ bool test4(std::string ip)
 		//-------------------------------------------------------------------
 		display_pole(Magnet);
 
-		Magnet->set_state(MAGNET_OFF);
+		Magnet->set_output_state(MAGNET_OFF);
 
 		delete Magnet;
 	}
 	catch(yat::Exception &e)
 	{
-		for(int i=0;i<e.errors.size();i++)		//gestion des exceptions empilées dans le vecteur d'erreur
+		for(int i=0;i<e.errors.size();i++)		//gestion des exceptions empilï¿½es dans le vecteur d'erreur
        		{
 			std::cout<<e.errors[i].reason<<" , "<<e.errors[i].desc<<" , "<<e.errors[i].origin<<" , "<<
 					e.errors[i].code<<std::endl;
@@ -358,7 +358,7 @@ void init_pole(PSC_ETH* pole)
 {
 	pole->clear_all_err();
 	//pole->set_trigger_state(TRIGGER_STATE_ON);
-	//pole->set_state(MAGNET_ON);
+	//pole->set_output_state(MAGNET_ON);
 	//pole->set_current(0);
 
 	
@@ -373,7 +373,7 @@ void init_pole(PSC_ETH* pole)
 void release_pole(PSC_ETH* pole)
 {
 	sleep(2);
-	pole->set_state(MAGNET_OFF);
+	pole->set_output_state(MAGNET_OFF);
 }
 /*
 void display_counter(PSC_ETH* pole)
@@ -390,7 +390,7 @@ void display_pole(PSC_ETH* pole)
 
 	std::cout<<"---------------MAGNET STATUS---------------"<<std::endl;
 	std::cout<<"MAGNET :"<<pole->addrIP()<<std::endl;
-	std::cout<<"STATE :"<<pole->get_state()<<std::endl;
+	std::cout<<"STATE :"<<pole->get_output_state()<<std::endl;
 	std::cout<<"FAIL :"<<pole->read_error()<<std::endl;
 	std::cout<<"MEASVOLT :"<<pole->get_measure_voltage()<<std::endl;
 	std::cout<<"MEASCURR :"<<pole->get_measure_current()<<std::endl;
@@ -408,7 +408,7 @@ void display_current(PSC_ETH* pole)
 	}
 	catch(yat::Exception &e)
 	{
-		for(int i=0;i<e.errors.size();i++)		//gestion des exceptions empilées dans le vecteur d'erreur
+		for(int i=0;i<e.errors.size();i++)		//gestion des exceptions empilï¿½es dans le vecteur d'erreur
        		{
 			std::cout<<e.errors[i].reason<<" , "<<e.errors[i].desc<<" , "<<e.errors[i].origin<<" , "<<
 					e.errors[i].code<<std::endl;
@@ -438,7 +438,7 @@ void display_request_rate(PSC_ETH* pole)
 		{
 			gettimeofday(&end, NULL);
 			error++;
-			for(int i=0;i<e.errors.size();i++)		//gestion des exceptions empilées dans le vecteur d'erreur
+			for(int i=0;i<e.errors.size();i++)		//gestion des exceptions empilï¿½es dans le vecteur d'erreur
 	       		{
 				std::cout<<e.errors[i].reason<<" , "<<e.errors[i].desc<<" , "<<e.errors[i].origin<<" , "<<
 						e.errors[i].code<<std::endl;
@@ -456,32 +456,45 @@ void testtest(std::string ip)
 	
 	PSC_ETH *pole = new PSC_ETH(ip);
 	
-
 	std::cout<<"MAGNET :"<<pole->addrIP()<<std::endl;
-
 	std::cout<<"All errors in buffer :"<<pole->read_error()<<std::endl;
 
-	std::cout<<"Read STATE :"<<pole->get_state()<<std::endl;
-	std::cout<<"Read FAIL :"<<pole->read_error()<<std::endl;
+	std::cout<<"ID :"<<pole->idn()<<std::endl;
+        
+        std::cout<<"Group :"<<pole->get_ps_group()<<std::endl;
 
-	std::cout<<"Set STATE = 1"<<std::endl;
-	pole->set_state(MAGNET_ON);
+	std::cout<<"Output? : "<<pole->get_output_state()<<std::endl;
+
+	std::cout<<"Set output state = 1"<<std::endl;
+	pole->set_output_state(MAGNET_ON);
 	sleep(2);
-	std::cout<<"Read STATE :"<<pole->get_state()<<std::endl;
-	std::cout<<"Read FAIL :"<<pole->read_error()<<std::endl;
+	std::cout<<"Output? : "<<pole->get_output_state()<<std::endl;
 
+        std::cout<<"Read max voltage: "<<pole->get_max_voltage()<<std::endl;
+
+        std::cout<<"Set current to 0.1 A"<<std::endl;
+	pole->set_current(0.1);
 	
 	std::cout<<"Read MEASVOLT :"<<pole->get_measure_voltage()<<std::endl;
 	std::cout<<"Read MEASCURR :"<<pole->get_measure_current()<<std::endl;
 	
-	std::cout<<"Set STATE = 0:"<<std::endl;
-	pole->set_state(MAGNET_OFF);
+        //std::cout<<" Read current state (0 = changing, 1 = stable) :"<<pole->get_current_state()<<std::endl;
+        std::cout<<" Poll current state until it stabilizes at set value "<<pole->get_source_current()<<std::endl;
+        while(!pole->get_current_state())
+        {
+                sleep(2);
+                std::cout<<"Read MEASCURR :"<<pole->get_measure_current()<<std::endl;
+        }
+        std::cout<<"Read MEASVOLT :"<<pole->get_measure_voltage()<<std::endl;
+	std::cout<<"Read MEASCURR :"<<pole->get_measure_current()<<std::endl;
+        
+	std::cout<<"Set output state = 0:"<<std::endl;
+	pole->set_output_state(MAGNET_OFF);
 	sleep(2);
-	std::cout<<"Read STATE :"<<pole->get_state()<<std::endl;
+	std::cout<<"Read output state :"<<pole->get_output_state()<<std::endl;
 	std::cout<<"Read FAIL :"<<pole->read_error()<<std::endl;
 
 	std::cout<<"-----------------------------------"<<std::endl;
-
 	delete pole;
 	
 }

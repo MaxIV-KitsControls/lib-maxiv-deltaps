@@ -6,90 +6,70 @@
 
 #define SOCK_PORT 8462
 
+#define PSGROUP_1               1
+#define PSGROUP_2               2
+#define PSGROUP_3               3
+
 #define MAGNET_OFF		0
 #define MAGNET_ON		1
+
+#define CURRENT_TOLERANCE       0.0001 //in A
+#define VOLTAGE_TOLERANCE       0.0001 //in V
 
 #define TRIGGER_STATE_OFF	0
 #define TRIGGER_STATE_ON	1
 #define TRIGGER_EDGE_RISING	0
 #define TRIGGER_EDGE_FALLING	1
 
-#define CURR_LATCH_SOURCE_VALUE	0
-#define CURR_LATCH_SOURCE_BUFFER 1
 
 class PSC_ETH
 {
 public:
-	PSC_ETH(const std::string ip_address);
+    PSC_ETH(const std::string ip_address);
 
-	virtual ~PSC_ETH();
+    virtual ~PSC_ETH();
 
-	std::string idn();
-	double max_voltage();
-	void set_max_voltage(double v);
-	std::string addrIP();
+    std::string idn();   
+    std::string addrIP();
+    int get_ps_group();
+    
+    std::string send_query(std::string query);
 
-	void send_software_trigger();
+    void send_software_trigger();
 
-		//current
-		double get_measure_current(void) throw (yat::Exception);
-		double get_current(void) throw (yat::Exception);
-		void set_current(double ValF) throw (yat::Exception);
-		double get_current_latch(void) throw (yat::Exception);
-		void set_current_latch(double ValF) throw (yat::Exception);
+    std::string read_error(void) throw (yat::Exception);
+    void clear_all_err(void) throw (yat::Exception);
 
-		bool get_current_latch_source(void) throw (yat::Exception);
-		void set_current_latch_source(bool Val) throw (yat::Exception);
+    int get_output_state(void) throw (yat::Exception);
+    void set_output_state(bool val) throw (yat::Exception);
 
-		double get_current_tracking_level(void) throw (yat::Exception);
-		void set_current_tracking_level(double ValF) throw (yat::Exception);
+    //current
+    double get_max_current();
+    void set_max_current(double v);
 
-		bool get_current_state(void) throw (yat::Exception);
-		bool get_voltage_state(void) throw (yat::Exception);
+    double get_measure_current(void) throw (yat::Exception);
+    double get_source_current(void) throw (yat::Exception);
+    void set_current(double ValF) throw (yat::Exception);
+    bool get_current_state(void) throw (yat::Exception);
 
-		bool get_current_tracking_status(void) throw (yat::Exception);
-		bool get_current_slope_completion(void) throw (yat::Exception);
-
-		double get_measure_voltage(void) throw (yat::Exception);
-
-		void get_idata(struct idata *) throw (yat::Exception);
-
-		bool get_trigger_edge(void) throw (yat::Exception);
-
-		//trigger
-		bool get_trigger_state(void) throw (yat::Exception);
-		void set_trigger_state(bool Val) throw (yat::Exception);
-		double get_trigger_delay(void) throw (yat::Exception);
-		void set_trigger_delay(double ValF) throw (yat::Exception);
-
-        	void initiate_trigger(void) throw (yat::Exception);
-
-		std::string read_error(void) throw (yat::Exception);
-		void clear_all_err(void) throw (yat::Exception);
-
-		int get_state(void) throw (yat::Exception);
-		int get_num_alarm(void) throw (yat::Exception);
-
-		void clear_alarm(void) throw (yat::Exception);
-
-		void set_state(bool val) throw (yat::Exception);
-
-		void get_ctn(int *ctn1,int *ctn2) throw (yat::Exception);
-
-		//table
-		void set_current_buffer(float *valF,int index,int count);
-		void get_current_buffer(float *valF,int index,int count);
-		void set_current_buffer_loop(bool state);
-		bool get_current_buffer_loop(void);
-
-		void set_current_buffer_sample(float valF);
-		float get_current_buffer_sample(void);
-		void set_current_buffer_range(int index,int count);
-		void get_current_buffer_range(int *index,int *count);
+    //voltage
+    double get_max_voltage();
+    void set_max_voltage(double v);
+    
+    double get_measure_voltage(void) throw (yat::Exception);
+    double get_source_voltage(void) throw (yat::Exception);
+    void set_voltage(double ValF) throw (yat::Exception);
+    bool get_voltage_state(void) throw (yat::Exception);
 
 private:
-	yat::ClientSocket sock;
-	std::string ip_address;
+    yat::ClientSocket sock;
+    std::string ip_address;
+    std::string id;
+    int ps_group;
+
+    int find_psgroup();
+        
+        
 };
 
 
