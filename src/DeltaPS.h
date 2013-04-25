@@ -25,7 +25,7 @@
 class PSC_ETH
 {
 public:
-    PSC_ETH(const std::string ip_address);
+    PSC_ETH(const std::string ip_address, int ps_group);
 
     virtual ~PSC_ETH();
 
@@ -66,8 +66,6 @@ private:
     std::string ip_address;
     std::string id;
     int ps_group;
-
-    int find_psgroup();
         
         
 };

@@ -4,8 +4,9 @@
 
 #define LF "\10"
 
-PSC_ETH::PSC_ETH(const std::string ip_address) {
+PSC_ETH::PSC_ETH(const std::string ip_address, int ps_group) {
 	this->ip_address = ip_address;
+        this->ps_group = ps_group;
     yat::Socket::init();
 
     //- set some socket option
@@ -32,12 +33,7 @@ catch(...)
 	yat::Exception e("Unknown error",Desc.str(),"PSC_ETH::Constructor");
 	throw e; 
         
-}       
-    sock << "*idn?\n";
-    sock >> id;
-
-    ps_group = find_psgroup();
-    
+}           
 }
 
 PSC_ETH::~PSC_ETH() {
@@ -78,29 +74,6 @@ std::string PSC_ETH::idn() {
 int PSC_ETH::get_ps_group()
 {
     return ps_group;
-}
-
-int PSC_ETH::find_psgroup()
-{
-    int group = 0;
-    
-    if(id.find("P179") != std::string::npos)
-    {
-        group = PSGROUP_1;
-    }
-    else if(id.find("P150") != std::string::npos)
-    {
-        group = PSGROUP_1;
-    }
-    else if(id.find("P256") != std::string::npos)
-    {
-        group = PSGROUP_2;
-    }
-    else if(id.find("SM66_AR_110") != std::string::npos)
-    {
-        group = PSGROUP_3;
-    }
-    return group;
 }
 
 std::string PSC_ETH::addrIP()

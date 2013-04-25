@@ -79,7 +79,7 @@ void test0()
 		delete Magnet;
 	}
 }*/
-void test1(std::string ip)
+void test1(std::string ip, int ps_group)
 {
 
 	try{
@@ -92,7 +92,7 @@ void test1(std::string ip)
 		//	Print the current, voltage and state, (fail etc) 	
 		
 
-		Magnet = new PSC_ETH(ip);
+		Magnet = new PSC_ETH(ip, ps_group);
 		std::cout<<Magnet->addrIP()<<std::endl;
 		Magnet->set_current(1);
 		std::cout<<"CURRENT SETTING:"<<1<<std::endl;
@@ -300,7 +300,7 @@ bool test3()
 	return result;
 }
 */
-bool test4(std::string ip)
+bool test4(std::string ip, int ps_group)
 {
 	bool result=false;
 
@@ -314,7 +314,7 @@ bool test4(std::string ip)
 		//	wait
 		//	Print the current, voltage and state, (fail etc)
 		
-		Magnet = new PSC_ETH(ip);
+		Magnet = new PSC_ETH(ip, ps_group);
 		
 		//-------------------------------------------------------------------
 		
@@ -450,11 +450,11 @@ void display_request_rate(PSC_ETH* pole)
 	}
 }
 
-void testtest(std::string ip)
+void testtest(std::string ip, int ps_group)
 {
 	std::cout << "----------------Testing the test:-----------------"<<std::endl;
 	
-	PSC_ETH *pole = new PSC_ETH(ip);
+	PSC_ETH *pole = new PSC_ETH(ip, ps_group);
 	
 	std::cout<<"MAGNET :"<<pole->addrIP()<<std::endl;
 	std::cout<<"All errors in buffer :"<<pole->read_error()<<std::endl;
@@ -511,9 +511,10 @@ main (int argc, char **argv)
 			std::cout << "Current display (pole="<<argv[3]<<";ip="<<argv[2]<<")"<<std::endl;
 
 			std::string ip = argv[2]; 
-			int pole_number = atoi(argv[3]);
-
-			PSC_ETH* pole = new PSC_ETH(ip.c_str());
+			//int pole_number = atoi(argv[3]);
+                        const char* ps_group = argv[3];
+			
+                        PSC_ETH* pole = new PSC_ETH(ip.c_str(), atoi(ps_group));
 			// Display the value indefinitively
 			int i=0;
 			while(true)
@@ -528,38 +529,42 @@ main (int argc, char **argv)
 		// Display the request rate
 		else if(strcmp(argv[1],"display-request-rate")==0 && argc>3)
 		{
-			std::cout << "Current display (pole="<<argv[3]<<";ip="<<argv[2]<<")"<<std::endl;
+			std::cout << "Current display (ip="<<argv[2]<<")"<<std::endl;
 
 			std::string ip = argv[2]; 
-			int pole_number = atoi(argv[3]);
-
-			PSC_ETH* pole = new PSC_ETH(ip.c_str());
+			//int pole_number = atoi(argv[3]);
+                        const char* ps_group = argv[3];
+                        
+			PSC_ETH* pole = new PSC_ETH(ip.c_str(), atoi(ps_group));
 			// Display the value indefinitively
 			//std::cout<<"Frame "<<i++<<std::endl;
 			display_request_rate(pole);
 			// In case of ...
 			delete pole;
 		}
-		else if(strcmp(argv[1],"test-1")==0 && argc>2)	
+		else if(strcmp(argv[1],"test-1")==0 && argc>3)	
 		{
 			std::cout << "Test-1 ip="<<argv[2]<<std::endl;
 			std::string ip = argv[2]; 
+                        const char* ps_group = argv[3];
 
-			test1(ip.c_str());
+			test1(ip.c_str(), atoi(ps_group));
 		}
-		else if(strcmp(argv[1],"test-4")==0 && argc>2)	
+		else if(strcmp(argv[1],"test-4")==0 && argc>3)	
 		{
 			std::cout << "Test-4 ip="<<argv[2]<<std::endl;
 			std::string ip = argv[2]; 
-
-			test4(ip.c_str());
+                        const char* ps_group = argv[3];
+                        
+			test4(ip.c_str(), atoi(ps_group));
 		}
-		else if(strcmp(argv[1],"testtest")==0 && argc>2)	
+		else if(strcmp(argv[1],"testtest")==0 && argc>3)	
 		{
 			std::cout << "Test Test ip="<<argv[2]<<std::endl;
 			std::string ip = argv[2]; 
-
-			testtest(ip.c_str());
+                        const char* ps_group = argv[3];
+                        
+			testtest(ip.c_str(), atoi(ps_group));
 		}
 	}
 	catch (const yat::SocketException &se)
@@ -593,9 +598,9 @@ main (int argc, char **argv)
 		std::cout << "* test-1 : " << std::endl;		
 		std::cout << "* test-4 : " << std::endl;
 		std::cout << std::endl;
-		std::cout << "   - Parameters are : IP" << std::endl;
+		std::cout << "   - Parameters are : IP PSGROUP" << std::endl;
 		std::cout << std::endl;
-		std::cout << "Example $> TestMagnet display-request-rate 192.168.150.107" << std::endl;
+		std::cout << "Example $> TestMagnet display-request-rate 192.168.150.107 1" << std::endl;
 		std::cout << "        > Current display (ip=192.168.150.107)" << std::endl;
 		std::cout << "        > Time to serve (0/25363): 1955             " << std::endl;
 		std::cout << "                         |   |      + response time in us " << std::endl;
