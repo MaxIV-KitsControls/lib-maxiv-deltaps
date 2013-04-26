@@ -116,8 +116,6 @@ void test1(std::string ip, int ps_group)
 
                 display_pole(pole);
 		pole->set_output_state(MAGNET_OFF);
-                wait_stable_current(pole);
-		display_pole(pole);
 
 		delete pole;		
 
