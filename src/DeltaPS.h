@@ -13,14 +13,12 @@
 #define MAGNET_OFF		0
 #define MAGNET_ON		1
 
-#define CURRENT_TOLERANCE       0.0001 //in A
-#define VOLTAGE_TOLERANCE       0.0001 //in V
-
 #define TRIGGER_STATE_OFF	0
 #define TRIGGER_STATE_ON	1
 #define TRIGGER_EDGE_RISING	0
 #define TRIGGER_EDGE_FALLING	1
 
+#define CURRENT_TOLERANCE 0.01
 
 class PSC_ETH
 {
@@ -50,7 +48,7 @@ public:
     double get_measure_current(void) throw (yat::Exception);
     double get_source_current(void) throw (yat::Exception);
     void set_current(double ValF) throw (yat::Exception);
-    bool get_current_state(void) throw (yat::Exception);
+    bool is_current_moving();
 
     //voltage
     double get_max_voltage();
@@ -59,10 +57,9 @@ public:
     double get_measure_voltage(void) throw (yat::Exception);
     double get_source_voltage(void) throw (yat::Exception);
     void set_voltage(double ValF) throw (yat::Exception);
-    bool get_voltage_state(void) throw (yat::Exception);
+    yat::ClientSocket sock;
 
 private:
-    yat::ClientSocket sock;
     std::string ip_address;
     std::string id;
     int ps_group;

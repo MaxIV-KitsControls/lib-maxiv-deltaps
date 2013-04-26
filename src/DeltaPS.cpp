@@ -150,70 +150,6 @@ catch(...)
 }
 }
 //---------------------------------------------------------------------------
-//Poll to see if requested current value is reached and stabilized
-//---------------------------------- 
-bool PSC_ETH::get_current_state(void) throw (yat::Exception)
-{
-try{
-	double meas_i, set_i;
-	bool state = false;
-
-	//compare measured current and set current
-        set_i = get_source_current();
-        meas_i = get_measure_current();
-        
-        state = std::abs(set_i - meas_i) < CURRENT_TOLERANCE;
-	
-	return state;
-}
-catch(yat::Exception &e)
-{
-	std::ostringstream Desc;
-	Desc<<"YAT exception caught on magnet with ip: "<<this->ip_address<<std::ends;
-	e.push_error("State could not be read",Desc.str(), "PSC_ETH::get_current_state");
-	throw e;
-}
-catch(...)
-{
-	std::ostringstream Desc;
-	Desc<<"Unknown exception caught on magnet with ip: "<<this->ip_address<<std::ends;
-	yat::Exception e("Unknown error",Desc.str(),"PSC_ETH::get_current_state");
-	throw e; 
-}
-}
-//---------------------------------------------------------------------------
-//Poll to see if requested voltage value has been reached and stabilized
-//---------------------------------- 
-bool PSC_ETH::get_voltage_state(void) throw (yat::Exception)
-{
-try{
-	double meas_v, set_v;
-	bool state = false;
-
-	//compare measured voltage and set voltage
-        set_v = get_source_voltage();
-        meas_v = get_measure_voltage();
-        
-        state = std::abs(set_v - meas_v) < VOLTAGE_TOLERANCE;
-	
-	return state;
-}
-catch(yat::Exception &e)
-{
-	std::ostringstream Desc;
-	Desc<<"YAT exception caught on magnet with ip: "<<this->ip_address<<std::ends;
-	e.push_error("State could not be read",Desc.str(), "PSC_ETH::get_voltage_state");
-	throw e;
-}
-catch(...)
-{
-	std::ostringstream Desc;
-	Desc<<"Unknown exception caught on magnet with ip: "<<this->ip_address<<std::ends;
-	yat::Exception e("Unknown error",Desc.str(),"PSC_ETH::get_voltage_state");
-	throw e; 
-}
-}
-//---------------------------------------------------------------------------
 //Read the Status:Operation:Shutdown:Condition register
 //bit 0 = protection summary
 //bit 1 = interlock
@@ -276,6 +212,14 @@ try{
             oss << "output " << val << "\n";
             sock << oss.str();
         }
+        //group 1 lacks on/off output setting. In case of state= 0 (OFF) set
+        //current to zero.
+        else if((ps_group == 1) && (val == MAGNET_OFF))
+        {
+            std::ostringstream oss;
+            oss << "source:current " << 0.0 << "\n";
+            sock << oss.str();
+        }
 }
 catch(yat::Exception &e)
 {
@@ -327,7 +271,7 @@ try{
 	
 	for(int i=0;i<5;i++)
 	{
-		sock << "system:error?\n";	
+		this->read_error();
 	}
 }
 catch(yat::Exception &e)
@@ -524,6 +468,26 @@ catch(...)
 	throw e; 
 }
 }
+
+//---------------------------------------------------------------------------
+//Poll to see if requested current value is reached and stabilized
+//---------------------------------- 
+bool PSC_ETH::is_current_moving()
+{
+
+	double meas_i, set_i;
+	bool state = false;
+
+	//compare measured current and set current
+        set_i = get_source_current();
+        //sleep(0.5);
+        meas_i = get_measure_current();
+        
+        state = std::abs(set_i - meas_i) > CURRENT_TOLERANCE;
+	
+	return state;
+}
+
 
 void PSC_ETH::send_software_trigger()
 {

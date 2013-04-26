@@ -6,7 +6,7 @@ TARGET = $(OUTPUT_DIR)/TestMagnet
 SOURCES = TestClass.cpp
 HEADERS = 
 
-CXXFLAGS = -I../../src
+CXXFLAGS = -I../../src -g
 LDFLAGS = -L../../lib -lDeltaPS -lyat  
 
 OBJS = $(SOURCES:.cpp=.o)

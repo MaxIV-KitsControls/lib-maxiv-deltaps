@@ -15,16 +15,19 @@
 
 #include "DeltaPS.h"
 
+
+
 //g++ -o TestClass TestClass.cpp -L./ -lMagnet
 //--------
 //g++ -D_REENTRANT -o TestClass TestClass.cpp -L./ -lMagnet -lpthread
 //--------
 
 using namespace std;
-PSC_ETH *Magnet=0;
+PSC_ETH *pole=0;
 
 //forward declarations
 void display_pole(PSC_ETH* pole);
+void wait_stable_current(PSC_ETH* pole);
 
 /* Return 1 if the difference is negative, otherwise 0.  */
 long int timeval_subtract(struct timeval *result, struct timeval *t2, struct timeval *t1)
@@ -92,22 +95,31 @@ void test1(std::string ip, int ps_group)
 		//	Print the current, voltage and state, (fail etc) 	
 		
 
-		Magnet = new PSC_ETH(ip, ps_group);
-		std::cout<<Magnet->addrIP()<<std::endl;
-		Magnet->set_current(1);
-		std::cout<<"CURRENT SETTING:"<<1<<std::endl;
-		Magnet->clear_all_err();
-		Magnet->set_output_state(1);
+		pole = new PSC_ETH(ip, ps_group);
+		std::cout<<pole->addrIP()<<std::endl;
+                pole->clear_all_err();
+//                std::string result;
+//                pole->sock >> result;
+//                std::cout<<"SOCKET :"<<result<<std::endl;
+                
+                pole->set_output_state(MAGNET_ON);
+                std::cout<<"MAX VOLTAGE :"<<pole->get_max_voltage()<<std::endl;
+                //pole->set_voltage(10);
+                sleep(0.001);
+		pole->set_current(0.4);
+		std::cout<<"CURRENT SETTING:"<<1.0f<<std::endl;
+		
 
-		sleep(2);
+		wait_stable_current(pole);
 
-		std::cout<<"STATE :"<<Magnet->get_output_state()<<std::endl;
+		std::cout<<"STATE :"<<pole->get_output_state()<<std::endl;
 
-		Magnet->set_output_state(0);
+                display_pole(pole);
+		pole->set_output_state(MAGNET_OFF);
+                wait_stable_current(pole);
+		display_pole(pole);
 
-		display_pole(Magnet);
-
-		delete Magnet;		
+		delete pole;		
 
 	}
 	catch(yat::Exception &e)
@@ -117,7 +129,7 @@ void test1(std::string ip, int ps_group)
 			std::cout<<e.errors[i].reason<<" , "<<e.errors[i].desc<<" , "<<e.errors[i].origin<<" , "<<
 					e.errors[i].code<<std::endl;
 		}
-		delete Magnet;
+		delete pole;
 	}	
 }
 /*
@@ -219,86 +231,6 @@ bool test2(std::string ip)
 	}	
 	return result;
 }
-
-bool test3()
-{
-	bool result=false;
-	try{
-		std::cout<<"---------------TEST3---------------"<<std::endl;
-
-		//	Hardware trigger timing test
-		//	Enable trigger
-		// 	Set state to ON
-		//	Set current
-		//	Print set current
-		//	Set current tracking level (stabilisation range)
-		// 	Print the read current until the set value is reached
-		//	Print the read current until it is stabilized
-		//	Print the current, voltage and state, (fail etc) 
-		//	Latch the current set point
-		//	Set trigger delay 3
-		//	Send hardware trigger
-		//	Wait for current to start changing 
-		// 	Print the read current until the set value is reached
-		//	Print the read current until it is stabilized
-		//	Print the current, voltage and state, (fail etc) 
-		//	Set state to OFF
-		
-
-		Magnet = new PSC_ETH("192.168.150.101");
-		Magnet->clear_all_err();
-		Magnet->set_trigger_state(TRIGGER_STATE_ON);
-		Magnet->set_output_state(MAGNET_ON);
-
-		Magnet->set_current(1.12345);
-		std::cout<<"CURRENT SETTING:"<<1.12345<<std::endl;
-		Magnet->set_current_tracking_level(50e-6);	
-		//-------------------------------------------------------------------	
-		do{
-			std::cout<<"\r"<<"MEASCURR1 :"<<Magnet->get_measure_current();
-		}while(!Magnet->get_current_slope_completion());
-		std::cout<<std::endl;
-		do{
-			std::cout<<"\r"<<"MEASCURR2 :"<<Magnet->get_measure_current();
-		}while(!Magnet->get_current_tracking_status());
-		std::cout<<std::endl;
-		//-------------------------------------------------------------------
-		display_pole(Magnet);
-
-		Magnet->set_current_latch(-2.65432);
-		std::cout<<"CURRENT TRIGGER SETTING:"<<-2.65432<<std::endl;
-		Magnet->set_trigger_delay(3);
-
-		//-------------------------------------------------------------------
-			while(Magnet->get_measure_current()>0.);
-		do{
-			std::cout<<"\r"<<"MEASCURR1 :"<<Magnet->get_measure_current();
-		}while(!Magnet->get_current_slope_completion());
-		std::cout<<std::endl;
-		do{
-			std::cout<<"\r"<<"MEASCURR2 :"<<Magnet->get_measure_current();
-		}while(!Magnet->get_current_tracking_status());
-		std::cout<<std::endl;
-		//-------------------------------------------------------------------
-		display_pole(Magnet);
-
-		Magnet->set_output_state(MAGNET_OFF);	
-	
-
-		delete Magnet;
-	}
-	catch(yat::Exception &e)
-	{
-		for(int i=0;i<e.errors.size();i++)		//gestion des exceptions empil�es dans le vecteur d'erreur
-       		{
-			std::cout<<e.errors[i].reason<<" , "<<e.errors[i].desc<<" , "<<e.errors[i].origin<<" , "<<
-					e.errors[i].code<<std::endl;
-		}
-		delete Magnet;
-	}
-
-	return result;
-}
 */
 bool test4(std::string ip, int ps_group)
 {
@@ -314,32 +246,32 @@ bool test4(std::string ip, int ps_group)
 		//	wait
 		//	Print the current, voltage and state, (fail etc)
 		
-		Magnet = new PSC_ETH(ip, ps_group);
+		pole = new PSC_ETH(ip, ps_group);
 		
 		//-------------------------------------------------------------------
 		
-		display_pole(Magnet);
+		display_pole(pole);
 
 		sleep(5);
-		Magnet->set_max_voltage(20);
+		pole->set_max_voltage(20);
 		sleep(2);
-		std::cout<<"MAX Voltage :"<<Magnet->get_max_voltage()<<std::endl;
-		Magnet->set_current(0.1);
+		std::cout<<"MAX Voltage :"<<pole->get_max_voltage()<<std::endl;
+		pole->set_current(0.1);
 
-		Magnet->set_output_state(MAGNET_ON);
+		pole->set_output_state(MAGNET_ON);
 
 		//-------------------------------------------------------------------
-		display_pole(Magnet);
+		display_pole(pole);
 		
 		
 		sleep(5);
 
 		//-------------------------------------------------------------------
-		display_pole(Magnet);
+		display_pole(pole);
 
-		Magnet->set_output_state(MAGNET_OFF);
+		pole->set_output_state(MAGNET_OFF);
 
-		delete Magnet;
+		delete pole;
 	}
 	catch(yat::Exception &e)
 	{
@@ -348,10 +280,19 @@ bool test4(std::string ip, int ps_group)
 			std::cout<<e.errors[i].reason<<" , "<<e.errors[i].desc<<" , "<<e.errors[i].origin<<" , "<<
 					e.errors[i].code<<std::endl;
 		}
-		delete Magnet;
+		delete pole;
 	}
 
 	return result;
+}
+
+void wait_stable_current(PSC_ETH* pole)
+{
+    while (pole->is_current_moving())
+    {
+        sleep(2);
+        std::cout << " Read MEASCURR :" << pole->get_measure_current() << std::endl;
+    }
 }
 
 void init_pole(PSC_ETH* pole)
@@ -375,15 +316,6 @@ void release_pole(PSC_ETH* pole)
 	sleep(2);
 	pole->set_output_state(MAGNET_OFF);
 }
-/*
-void display_counter(PSC_ETH* pole)
-{
-	int ctn1,ctn2;
-	pole->get_ctn(&ctn1,&ctn2);
-	std::cout<<"---------------CTN---------------"<<std::endl;
-	std::cout<<"CTN3 :"<<ctn1<<std::endl;
-	std::cout<<"CTN4 :"<<ctn2<<std::endl;
-}*/
 
 void display_pole(PSC_ETH* pole)
 {
@@ -472,21 +404,24 @@ void testtest(std::string ip, int ps_group)
 
         std::cout<<"Read max voltage: "<<pole->get_max_voltage()<<std::endl;
 
-        std::cout<<"Set current to 0.1 A"<<std::endl;
-	pole->set_current(0.1);
+        std::cout << "Set voltage to 10 V" << std::endl;
+        pole->set_voltage(10);
+
+        std::cout<<"Set current to 0.4 A"<<std::endl;
+	pole->set_current(0.4);
 	
 	std::cout<<"Read MEASVOLT :"<<pole->get_measure_voltage()<<std::endl;
 	std::cout<<"Read MEASCURR :"<<pole->get_measure_current()<<std::endl;
 	
         //std::cout<<" Read current state (0 = changing, 1 = stable) :"<<pole->get_current_state()<<std::endl;
         std::cout<<" Poll current state until it stabilizes at set value "<<pole->get_source_current()<<std::endl;
-        while(!pole->get_current_state())
-        {
-                sleep(2);
-                std::cout<<"Read MEASCURR :"<<pole->get_measure_current()<<std::endl;
-        }
+        wait_stable_current(pole);
         std::cout<<"Read MEASVOLT :"<<pole->get_measure_voltage()<<std::endl;
 	std::cout<<"Read MEASCURR :"<<pole->get_measure_current()<<std::endl;
+        
+        std::cout<<"Set the current to 0 = 0:"<<std::endl;
+        pole->set_current(0.0);
+	  
         
 	std::cout<<"Set output state = 0:"<<std::endl;
 	pole->set_output_state(MAGNET_OFF);
@@ -498,6 +433,8 @@ void testtest(std::string ip, int ps_group)
 	delete pole;
 	
 }
+
+
 
 main (int argc, char **argv)
 { 

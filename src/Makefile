@@ -9,6 +9,8 @@ HEADERS = $(wildcard *.h)
 OBJS = $(SOURCES:.cpp=.o)
 RANLIB = ranlib
 
+CXXFLAGS = -g
+
 all: $(TARGET)
 
 $(TARGET): $(OBJS) $(HEADERS) Makefile
