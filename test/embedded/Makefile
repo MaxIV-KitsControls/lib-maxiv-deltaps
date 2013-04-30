@@ -3,8 +3,8 @@ PLATFORM = "pi"
 
 OBJS = $(TARGET).o
 
-CXXFLAGS = -I../../src
-LDFLAGS = -L../../lib -lMagnet
+CXXFLAGS = -I../../src -I/home/pi/include
+LDFLAGS = -L../../lib -lDeltaPS -L/home/pi/lib -lyat -L/lib/arm-linux-gnueabihf -lpthread -ldl
 
 ifeq ($(PLATFORM), "pi")
 OBJS += bcm2835_gpio.o

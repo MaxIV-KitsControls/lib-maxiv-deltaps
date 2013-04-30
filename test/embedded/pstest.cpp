@@ -3,19 +3,18 @@
 #include <signal.h>
 #include <iostream>
 
-#include "ClassMagnet.h"
+#include "DeltaPS.h"
 #include "gpio.h"
 
 #define GPIO_PIN 8
 #define MAX_WAVEFORM_SAMPLES 1024
 
 using namespace std;
-using namespace itest;
 
 // globals
 float buffer[MAX_WAVEFORM_SAMPLES];
 
-itPole2811 *m1, *m2;
+PSC_ETH *m1, *m2;
 
 int read_waveform(const char *filename);
 
@@ -26,10 +25,10 @@ void test1()
 	cout << "########################################" << endl;
 	m1->set_current(0);
 	m2->set_current(0);
-	m1->set_state(1);
-	m2->set_state(1);
-	m1->set_trigger_state(TRIGGER_STATE_OFF);
-	m2->set_trigger_state(TRIGGER_STATE_OFF);
+	m1->set_output_state(1);
+	m2->set_output_state(1);
+	//m1->set_trigger_state(TRIGGER_STATE_OFF);
+	//m2->set_trigger_state(TRIGGER_STATE_OFF);
 	sleep(2);
 
 	for(int i = 0; i<1000; i++)
@@ -45,8 +44,8 @@ void test1()
 		usleep(200000);
 	}
 
-	m1->set_state(0);
-	m2->set_state(0);
+	m1->set_output_state(0);
+	m2->set_output_state(0);
 }
 
 void test2()
@@ -57,15 +56,15 @@ void test2()
 
 	m1->set_current(0);
 	m2->set_current(0);
-	m1->set_state(1);
-	m2->set_state(1);
-	m1->set_trigger_state(TRIGGER_STATE_ON);
-	m2->set_trigger_state(TRIGGER_STATE_ON);
-	m1->set_trigger_delay(0);
-	m2->set_trigger_delay(0);
+	m1->set_output_state(1);
+	m2->set_output_state(1);
+	//m1->set_trigger_state(TRIGGER_STATE_ON);
+	//m2->set_trigger_state(TRIGGER_STATE_ON);
+	//m1->set_trigger_delay(0);
+	//m2->set_trigger_delay(0);
 	sleep(2);
 
-	for(int i = 0; i<1000; i++)
+	/*for(int i = 0; i<1000; i++)
 	{
 		printf("%d\n", i);
 		m1->set_current_latch(1);
@@ -80,10 +79,10 @@ void test2()
 		m1->set_current(0);
 		m2->set_current(0);
 		usleep(100000);
-	}
+	}*/
 
-	m1->set_state(0);
-	m2->set_state(0);
+	m1->set_output_state(0);
+	m2->set_output_state(0);
 }
 
 void test3()
@@ -93,8 +92,8 @@ void test3()
 	cout << "########################################" << endl;
 
 	m1->set_current(0);
-	m1->set_state(1);
-	m1->set_trigger_state(TRIGGER_STATE_OFF);
+	m1->set_output_state(1);
+	//m1->set_trigger_state(TRIGGER_STATE_OFF);
 	sleep(2);
 
 	int n_samples = read_waveform("test3.txt");
@@ -110,7 +109,7 @@ void test3()
 		}
 	}
 	m1->set_current(0);
-	m1->set_state(0);
+	m1->set_output_state(0);
 }
 
 int read_waveform(const char *filename)
@@ -135,18 +134,23 @@ int read_waveform(const char *filename)
 
 int main()
 {
-	int rv = gpio_init(GPIO_PIN, GPIO_OUTPUT);
+	
+
+
+/*int rv = gpio_init(GPIO_PIN, GPIO_OUTPUT);
 	if (rv < 0)
 	{
 		perror("gpio_init failed");
 		return rv;
 	}
-	try {
-		m1 = new itPole2811("192.168.150.101", 1, 1);
-		m2 = new itPole2811("192.168.150.107", 1, 2);
+*/	try {
+		m1 = new PSC_ETH("130.235.95.232", 1);
+		m2 = new PSC_ETH("130.235.94.85", 3);
+		cout << m1->send_query("*IDN?")<< endl;
+		cout << m2->send_query("*IDN?")<< endl;
 		test2();
 	}
-	catch(ItestException &e)
+	catch(yat::Exception &e)
 	{
 		for(int i=0; i<e.errors.size(); i++)
       		{
@@ -156,7 +160,7 @@ int main()
 
 	delete m1;
 	delete m2;
-	rv = gpio_free(GPIO_PIN);
-
-	return rv;
+	//rv = gpio_free(GPIO_PIN);
+return 0;
+//	return rv;
 }

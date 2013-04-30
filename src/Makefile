@@ -1,15 +1,18 @@
 OUTPUT_DIR = ../lib
-INSTALL_PREFIX = /home/tango
+INSTALL_PREFIX = /home/pi
 
 TARGET = $(OUTPUT_DIR)/libDeltaPS.a
 
 SOURCES = $(wildcard *.cpp)
-HEADERS = $(wildcard *.h)
+HEADERS = $(wildcard *.h) 
+
+INCLUDES = -I$(INSTALL_PREFIX)/include
+LDFLAGS = -L$(INSTALL_PREFIX)/lib -lyat
 
 OBJS = $(SOURCES:.cpp=.o)
 RANLIB = ranlib
 
-CXXFLAGS = -g
+CXXFLAGS = -g $(INCLUDES)
 
 all: $(TARGET)
 
