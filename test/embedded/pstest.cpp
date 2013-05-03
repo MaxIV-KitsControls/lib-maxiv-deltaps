@@ -137,13 +137,13 @@ int main()
 	
 
 
-/*int rv = gpio_init(GPIO_PIN, GPIO_OUTPUT);
+        int rv = gpio_init(GPIO_PIN, GPIO_OUTPUT);
 	if (rv < 0)
 	{
 		perror("gpio_init failed");
 		return rv;
 	}
-*/	try {
+	try {
 		m1 = new PSC_ETH("130.235.95.232", 1);
 		m2 = new PSC_ETH("130.235.94.85", 3);
 		cout << m1->send_query("*IDN?")<< endl;
@@ -160,7 +160,7 @@ int main()
 
 	delete m1;
 	delete m2;
-	//rv = gpio_free(GPIO_PIN);
+	rv = gpio_free(GPIO_PIN);
 return 0;
-//	return rv;
+	return rv;
 }
