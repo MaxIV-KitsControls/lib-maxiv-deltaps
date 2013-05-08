@@ -68,7 +68,12 @@ catch(...)
 }
 
 std::string PSC_ETH::idn() {
-	return id;
+    std::string reply;
+    
+    sock << "*idn?\n";
+    sock >> reply;
+            
+    return reply;
 }
 
 int PSC_ETH::get_ps_group()
@@ -167,7 +172,7 @@ try{
         }
         else if(ps_group == PSGROUP_2)
         {
-            sock << "status:operation:shutdown:condition\n";
+            sock << "status:operation:shutdown:condition?\n";
             sock >> reply;
 
             std::istringstream i(reply);

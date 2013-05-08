@@ -104,7 +104,7 @@ void test1(std::string ip, int ps_group)
                 
                 pole->set_output_state(MAGNET_ON);
                 std::cout<<"MAX VOLTAGE :"<<pole->get_max_voltage()<<std::endl;
-                //pole->set_voltage(10);
+                pole->set_voltage(10);
                 sleep(0.001);
 		pole->set_current(0.4);
 		std::cout<<"CURRENT SETTING:"<<1.0f<<std::endl;
@@ -251,9 +251,8 @@ bool test4(std::string ip, int ps_group)
 		display_pole(pole);
 
 		sleep(5);
-		pole->set_max_voltage(20);
+		pole->set_voltage(10);
 		sleep(2);
-		std::cout<<"MAX Voltage :"<<pole->get_max_voltage()<<std::endl;
 		pole->set_current(0.1);
 
 		pole->set_output_state(MAGNET_ON);
@@ -388,6 +387,7 @@ void testtest(std::string ip, int ps_group)
 	
 	std::cout<<"MAGNET :"<<pole->addrIP()<<std::endl;
 	std::cout<<"All errors in buffer :"<<pole->read_error()<<std::endl;
+        pole->clear_all_err();
 
 	std::cout<<"ID :"<<pole->idn()<<std::endl;
         
