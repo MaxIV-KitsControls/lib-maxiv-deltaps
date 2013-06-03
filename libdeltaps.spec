@@ -13,7 +13,10 @@ License: 	GPL
 URL:		http://www.maxlab.lu.se
 Group:		System Environment/Libraries
 Source: 	%{name}-%{version}.tar.gz
-
+Requires:	libyat
+BuildRequires: libyat-devel
+# for pogo Makefile templates:
+BuildRequires: tango-java
 Requires(post):	/sbin/ldconfig
 
 %description
@@ -24,7 +27,8 @@ via ethernet
 Summary:	Header files and libraries needed for %{name} development
 Group:		Development/Libraries
 Requires:	%{name} = %{version}-%{release}
-#AutoReqProv:	no
+Requires: 	libyat-devel
+AutoReqProv: no
 
 %description devel
 Header files and static libraries for developing programs using %{name}.
