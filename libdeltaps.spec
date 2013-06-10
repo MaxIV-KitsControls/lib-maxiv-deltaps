@@ -85,6 +85,8 @@ popd > /dev/null
 %{_includedir}/*
 
 %changelog
+* Mon Jun 10 2013 Mirjam Lindberg <mirjam.lindberg@maxlab.lu.se> 1.1.0-1.20130610git
+- Changed tolerance from hardcoded value to property. 
+- Added some exception handling.
 * Mon Jun 03 2013 Andreas Persson <andreas_g.persson@maxlab.lu.se> 1.0.0-1.20130603git
 - initial package
-* Mon Jun 10 2013 Mirjam Lindberg <mirjam.lindberg@maxlab.lu.se> 1.1.0-1.20130610git
