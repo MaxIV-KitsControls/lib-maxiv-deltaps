@@ -7,7 +7,7 @@ SOURCES = TestClass.cpp
 HEADERS = 
 
 CXXFLAGS = -I../../src -g
-LDFLAGS = -L../../lib -lDeltaPS -lyat  
+LDFLAGS = -L../../lib -lDeltaPS -lyatd  
 
 OBJS = $(SOURCES:.cpp=.o)
 RANLIB = ranlib

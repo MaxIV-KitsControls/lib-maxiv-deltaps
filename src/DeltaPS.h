@@ -18,8 +18,6 @@
 #define TRIGGER_EDGE_RISING	0
 #define TRIGGER_EDGE_FALLING	1
 
-#define CURRENT_TOLERANCE 0.01
-
 class PSC_ETH
 {
 public:
@@ -31,7 +29,7 @@ public:
     std::string addrIP();
     int get_ps_group();
     
-    std::string send_query(std::string query);
+    std::string send_query(std::string query) throw (yat::Exception);
 
     void send_software_trigger();
 
@@ -42,27 +40,32 @@ public:
     void set_output_state(bool val) throw (yat::Exception);
 
     //current
-    double get_max_current();
-    void set_max_current(double v);
+    double get_max_current() throw (yat::Exception);
+    void set_max_current(double v) throw (yat::Exception);
 
     double get_measure_current(void) throw (yat::Exception);
     double get_source_current(void) throw (yat::Exception);
     void set_current(double ValF) throw (yat::Exception);
-    bool is_current_moving();
+    bool is_current_moving() throw (yat::Exception);
 
     //voltage
-    double get_max_voltage();
-    void set_max_voltage(double v);
+    double get_max_voltage() throw (yat::Exception);
+    void set_max_voltage(double v) throw (yat::Exception);
     
     double get_measure_voltage(void) throw (yat::Exception);
     double get_source_voltage(void) throw (yat::Exception);
     void set_voltage(double ValF) throw (yat::Exception);
     yat::ClientSocket sock;
+    
+    //tolerance
+    double get_tolerance(void);
+    void set_tolerance(double tol);
 
 private:
     std::string ip_address;
     std::string id;
     int ps_group;
+    double current_tolerance;
         
         
 };

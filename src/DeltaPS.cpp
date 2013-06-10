@@ -7,6 +7,9 @@
 PSC_ETH::PSC_ETH(const std::string ip_address, int ps_group) {
 	this->ip_address = ip_address;
         this->ps_group = ps_group;
+        //set default tolerance to 1%
+        this->current_tolerance = 0.01;
+        
     yat::Socket::init();
 
     //- set some socket option
@@ -41,7 +44,8 @@ PSC_ETH::~PSC_ETH() {
     yat::Socket::terminate();
 }
 
-std::string PSC_ETH::send_query(std::string query) {
+std::string PSC_ETH::send_query(std::string query) throw (yat::Exception)
+{
 	std::string result;
 	std::ostringstream oss;
 try{
@@ -55,7 +59,7 @@ catch(yat::Exception &e)
 {
 	std::ostringstream Desc;
 	Desc<<"YAT exception caught on magnet with ip: "<<this->ip_address<<std::ends;
-	e.push_error("Query could not be sent",Desc.str(), "PSC_ETH::send_query");
+	e.push_error("Query could not be sent, maybe format was incorrect",Desc.str(), "PSC_ETH::send_query");
 	throw e;
 }
 catch(...)
@@ -86,19 +90,38 @@ std::string PSC_ETH::addrIP()
 	return ip_address;
 }
 
-double PSC_ETH::get_max_voltage() {
+double PSC_ETH::get_max_voltage() throw (yat::Exception)
+{
 	std::string reply;
 	double d;
+        
+        try{
 
-	sock << "source:voltage:maximum?\n";
-	sock >> reply;
-
-	std::istringstream i(reply);
-	i >> d;
-	return d;
+            sock << "source:voltage:maximum?\n";
+            sock >> reply;
+        
+            std::istringstream i(reply);
+            i >> d;
+            return d;
+        }
+        catch(yat::Exception &e)
+        {
+            std::ostringstream Desc;
+            Desc<<"YAT exception caught on magnet with ip: "<<this->ip_address<<std::ends;
+            e.push_error("Max voltage could not be read",Desc.str(), "PSC_ETH::get_max_voltage");
+            throw e;
+        }
+        catch(...)
+        {
+            std::ostringstream Desc;
+            Desc<<"Unknown exception caught on magnet with ip: "<<this->ip_address<<std::ends;
+            yat::Exception e("Unknown error",Desc.str(),"PSC_ETH::get_max_voltage");
+            throw e; 
+        }
 }
 
-void PSC_ETH::set_max_voltage(double v) {
+void PSC_ETH::set_max_voltage(double v) throw (yat::Exception)
+{
 try{	
 	std::ostringstream oss;
 
@@ -120,19 +143,38 @@ catch(...)
 	throw e; 
 }
 }
-double PSC_ETH::get_max_current() {
+
+double PSC_ETH::get_max_current() throw (yat::Exception)
+{
 	std::string reply;
 	double d;
+        
+        try{
+            sock << "source:current:maximum?\n";
+            sock >> reply;
 
-	sock << "source:current:maximum?\n";
-	sock >> reply;
-
-	std::istringstream i(reply);
-	i >> d;
-	return d;
+            std::istringstream i(reply);
+            i >> d;
+            return d;
+        }
+        catch(yat::Exception &e)
+        {
+            std::ostringstream Desc;
+            Desc<<"YAT exception caught on magnet with ip: "<<this->ip_address<<std::ends;
+            e.push_error("Max current could not be read",Desc.str(), "PSC_ETH::get_max_current");
+            throw e;
+        }
+        catch(...)
+        {
+            std::ostringstream Desc;
+            Desc<<"Unknown exception caught on magnet with ip: "<<this->ip_address<<std::ends;
+            yat::Exception e("Unknown error",Desc.str(),"PSC_ETH::get_max_current");
+            throw e; 
+        }
 }
 
-void PSC_ETH::set_max_current(double v) {
+void PSC_ETH::set_max_current(double v) throw (yat::Exception)
+{
 try{	
 	std::ostringstream oss;
 
@@ -474,23 +516,45 @@ catch(...)
 }
 }
 
+double PSC_ETH::get_tolerance(void)
+{
+    return current_tolerance; 
+}
+
+void PSC_ETH::set_tolerance(double tol)
+{
+    current_tolerance = tol;
+}
+
 //---------------------------------------------------------------------------
 //Poll to see if requested current value is reached and stabilized
 //---------------------------------- 
-bool PSC_ETH::is_current_moving()
+bool PSC_ETH::is_current_moving() throw (yat::Exception)
 {
 
 	double meas_i, set_i;
 	bool state = false;
+        try{
+            //compare measured current and set current
+            set_i = get_source_current();
+            //sleep(0.5);
+            meas_i = get_measure_current();
+        }
+        catch(yat::Exception &e)
+        {
+            throw e;
+        }
+        catch(...)
+        {
+            std::ostringstream Desc;
+            Desc<<"Unknown exception caught on magnet with ip: "<<this->ip_address<<std::ends;
+            yat::Exception e("Unknown error",Desc.str(),"PSC_ETH::is_current_moving");
+            throw e; 
+        }
 
-	//compare measured current and set current
-        set_i = get_source_current();
-        //sleep(0.5);
-        meas_i = get_measure_current();
-        
-        state = std::abs(set_i - meas_i) > CURRENT_TOLERANCE;
-	
-	return state;
+        state = std::abs(set_i - meas_i) > current_tolerance;
+
+        return state;
 }
 
 
