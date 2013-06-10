@@ -31,7 +31,7 @@ YAT_HOME = $(TANGO_HOME)
 #
 PACKAGE_NAME = DeltaPS
 MAJOR_VERS   = 1
-MINOR_VERS   = 0
+MINOR_VERS   = 1
 RELEASE      = Release_$(MAJOR_VERS)_$(MINOR_VERS)
 
 # #=============================================================================

@@ -1,10 +1,10 @@
 
 # date of git snapshot
-%define snapshot .20130603git
+%define snapshot .20130610git
 
 Summary: 	Library for controlling power supplies from Delta Elektronika
 Name:    	libdeltaps
-Version: 	1.0.0
+Version: 	1.1.0
 # post-release
 # see http://fedoraproject.org/wiki/Packaging:NamingGuidelines#Non-Numeric_Version_in_Release
 # 
@@ -87,3 +87,4 @@ popd > /dev/null
 %changelog
 * Mon Jun 03 2013 Andreas Persson <andreas_g.persson@maxlab.lu.se> 1.0.0-1.20130603git
 - initial package
+* Mon Jun 10 2013 Mirjam Lindberg <mirjam.lindberg@maxlab.lu.se> 1.1.0-1.20130610git
