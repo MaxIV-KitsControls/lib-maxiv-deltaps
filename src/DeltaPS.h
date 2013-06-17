@@ -13,10 +13,6 @@
 #define MAGNET_OFF		0
 #define MAGNET_ON		1
 
-#define TRIGGER_STATE_OFF	0
-#define TRIGGER_STATE_ON	1
-#define TRIGGER_EDGE_RISING	0
-#define TRIGGER_EDGE_FALLING	1
 
 class PSC_ETH
 {
@@ -38,6 +34,8 @@ public:
 
     int get_output_state(void) throw (yat::Exception);
     void set_output_state(bool val) throw (yat::Exception);
+    
+    int get_interlock_state(void) throw (yat::Exception);
 
     //current
     double get_max_current() throw (yat::Exception);
@@ -66,6 +64,10 @@ private:
     std::string id;
     int ps_group;
     double current_tolerance;
+    
+    int read_group2_register(void) throw (yat::Exception);
+    int read_group3_register(void) throw (yat::Exception);
+    
         
         
 };

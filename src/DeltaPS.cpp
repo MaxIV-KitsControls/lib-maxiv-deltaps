@@ -197,11 +197,10 @@ catch(...)
 }
 }
 //---------------------------------------------------------------------------
-//Read the Status:Operation:Shutdown:Condition register
-//bit 0 = protection summary
-//bit 1 = interlock
-//bit 2 = RSD
-//bit 3 = Output On/Off
+//Output state:
+//OFF = 0
+//ON = 1
+//Command not supported = -1
 //---------------------------------- 
 int PSC_ETH::get_output_state(void) throw (yat::Exception)
 {
@@ -214,14 +213,9 @@ try{
         }
         else if(ps_group == PSGROUP_2)
         {
-            sock << "status:operation:shutdown:condition?\n";
-            sock >> reply;
-
-            std::istringstream i(reply);
-            i >> d;
-            if (d == 8)
-                d = 1;
-        }
+            d = this->read_group2_register();
+            d=d&0x1000;
+        }          
         else if(ps_group == PSGROUP_3)
         {
             sock << "OUTPUT?\n";
@@ -283,6 +277,55 @@ catch(...)
 	throw e; 
 }
 }
+
+//---------------------------------------------------------------------------
+//Interlock state:
+//OFF = 0
+//ON = 1
+//Command not supported = -1
+//---------------------------------- 
+int PSC_ETH::get_interlock_state(void) throw (yat::Exception)
+{
+    int ret = 0;
+    try
+    {
+        unsigned short reg = 0;
+        if (ps_group == PSGROUP_1)
+        {
+            ret = -1; //not supported
+        }
+        else if (ps_group == PSGROUP_2)
+        {
+            reg = this->read_group2_register();
+            reg = reg & 0x0002;
+        }
+        else if (ps_group == PSGROUP_3)
+        {
+            reg = this->read_group3_register();
+            reg = reg & 0x0800;
+        }
+        if(reg > 0)
+            ret = 1;
+
+    }
+    catch (yat::Exception &e)
+    {
+        std::ostringstream Desc;
+        Desc << "YAT exception caught on magnet with ip: " << this->ip_address << std::ends;
+        e.push_error("State could not be read", Desc.str(), "PSC_ETH::get_state");
+        throw e;
+    }
+    catch (...)
+    {
+        std::ostringstream Desc;
+        Desc << "Unknown exception caught on magnet with ip: " << this->ip_address << std::ends;
+        yat::Exception e("Unknown error", Desc.str(), "PSC_ETH::get_state");
+        throw e;
+    }
+    
+    return ret;
+}
+
 //---------------------------------------------------------------------------------
 std::string PSC_ETH::read_error(void) throw (yat::Exception)
 {
@@ -555,6 +598,77 @@ bool PSC_ETH::is_current_moving() throw (yat::Exception)
         state = std::abs(set_i - meas_i) > current_tolerance;
 
         return state;
+}
+
+//---------------------------------------------------------------------------
+//Read the Status:Operation:Shutdown:Condition register
+//bit 0 = protection summary
+//bit 1 = interlock
+//bit 2 = RSD
+//bit 3 = Output On/Off
+//---------------------------------- 
+int PSC_ETH::read_group2_register(void) throw (yat::Exception)
+{
+    try
+    {
+        std::string reply;
+        int d = 0;
+        sock << "status:operation:shutdown:condition?\n";
+        sock >> reply;
+
+        std::istringstream i(reply);
+        i >> d;
+        return d;
+
+    }
+    catch (yat::Exception &e)
+    {
+        std::ostringstream Desc;
+        Desc << "YAT exception caught on magnet with ip: " << this->ip_address << std::ends;
+        e.push_error("State could not be read", Desc.str(), "PSC_ETH::get_state");
+        throw e;
+    }
+    catch (...)
+    {
+        std::ostringstream Desc;
+        Desc << "Unknown exception caught on magnet with ip: " << this->ip_address << std::ends;
+        yat::Exception e("Unknown error", Desc.str(), "PSC_ETH::get_state");
+        throw e;
+    }
+
+}
+
+int PSC_ETH::read_group3_register(void) throw (yat::Exception)
+{
+    try
+    {
+        std::string reply;
+        int d = 0;
+
+        sock << "status:register:A?\n";
+        sock >> reply;
+
+        std::istringstream i(reply);
+        i >> d;
+
+        return d;
+
+    }
+    catch (yat::Exception &e)
+    {
+        std::ostringstream Desc;
+        Desc << "YAT exception caught on magnet with ip: " << this->ip_address << std::ends;
+        e.push_error("State could not be read", Desc.str(), "PSC_ETH::get_state");
+        throw e;
+    }
+    catch (...)
+    {
+        std::ostringstream Desc;
+        Desc << "Unknown exception caught on magnet with ip: " << this->ip_address << std::ends;
+        yat::Exception e("Unknown error", Desc.str(), "PSC_ETH::get_state");
+        throw e;
+    }
+
 }
 
 

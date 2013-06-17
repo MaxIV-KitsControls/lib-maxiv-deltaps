@@ -400,6 +400,10 @@ void testtest(std::string ip, int ps_group)
 	sleep(2);
 	std::cout<<"Output? : "<<pole->get_output_state()<<std::endl;
 
+        std::cout<<"Interlock? : "<<pole->get_interlock_state()<<std::endl;
+        sleep(5);
+        std::cout<<"Interlock? : "<<pole->get_interlock_state()<<std::endl;
+        
         std::cout<<"Read max voltage: "<<pole->get_max_voltage()<<std::endl;
 
         std::cout << "Set voltage to 10 V" << std::endl;
